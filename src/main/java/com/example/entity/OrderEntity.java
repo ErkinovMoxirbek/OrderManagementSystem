@@ -23,11 +23,7 @@ public class OrderEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @NotNull
-    @NotBlank
     private String customerName;
-    @NotNull
-    @NotBlank
     private String customerEmail;
 
     private LocalDateTime orderDate = LocalDateTime.now();
@@ -35,6 +31,9 @@ public class OrderEntity {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PENDING;
     private Double totalAmount;
+
+    @OneToMany
+    private List<OrderItemEntity> orderItems;
 
 
     public Long getId() {
