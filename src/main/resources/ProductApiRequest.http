@@ -1,0 +1,31 @@
+###Add
+POST http://localhost:8080/api/products
+Content-Type: application/json
+
+{
+  "name": "Pepsi",
+  "price": 12000,
+  "stock": "12",
+  "category": "Gazli SUV"
+}
+###List
+GET http://localhost:8080/api/products
+
+###Get
+GET http://localhost:8080/api/products/1
+
+###updateById
+
+PUT http://localhost:8080/api/products/1
+Content-Type: application/json
+
+{
+  "name": "Pepsi",
+  "price": 12000,
+  "stock": "12",
+  "category": "Gazli SUV"
+}
+
+
+###Delete
+DELETE http://localhost:8080/api/products/5
