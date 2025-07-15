@@ -18,9 +18,9 @@ public class OrderItemController {
     @Autowired
     private OrderItemService orderItemService;
     @PostMapping
-    public ResponseEntity<OrderItemEntity> addOrder(@Valid @RequestBody OrderItemEntity entity) {
-        System.out.println(entity.toString());
-        return ResponseEntity.ok(orderItemService.add(entity));
+    public ResponseEntity<OrderItemDTO> addOrder(@Valid @RequestBody OrderItemDTO orderItemDTO) {
+        System.out.println(orderItemDTO.toString());
+        return ResponseEntity.ok(orderItemService.add(orderItemDTO));
     }
     @GetMapping
     public ResponseEntity<List<OrderItemDTO>> getAllOrders() {

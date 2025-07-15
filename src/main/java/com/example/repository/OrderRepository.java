@@ -36,7 +36,7 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
         FROM OrderEntity o
         where o.customerEmail = :email
     """)
-    List<OrderDTO> findAllByCustomerEmail(String email);
+    OrderDTO findAllByCustomerEmail(String email);
    @Query("""
         SELECT new com.example.dto.OrderDTO(
             o.id,

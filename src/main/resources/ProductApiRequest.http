@@ -5,7 +5,7 @@ Content-Type: application/json
 {
   "name": "Non",
   "price": 5000,
-  "stock": "12",
+  "stock": 10,
   "category": "Hamir"
 }
 ###List

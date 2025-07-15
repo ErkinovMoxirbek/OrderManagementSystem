@@ -9,6 +9,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface OrderItemRepository extends JpaRepository<OrderItemEntity, Long> {
+   OrderItemEntity findByProductId(long productId);
+   OrderItemEntity findByOrderId(long orderId);
+   OrderItemEntity findByOrderIdAndProductId(long orderId, long productId);
+   List<OrderItemEntity> findAllByOrderId(long orderId);
     @Query("""
         SELECT new com.example.dto.OrderItemDTO(
             o.id,
@@ -21,4 +25,5 @@ public interface OrderItemRepository extends JpaRepository<OrderItemEntity, Long
         FROM OrderItemEntity o
     """)
     List<OrderItemDTO> findAllDTO();
+
 }

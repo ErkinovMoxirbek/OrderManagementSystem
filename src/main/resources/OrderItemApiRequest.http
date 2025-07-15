@@ -3,9 +3,9 @@ POST http://localhost:8080/api/order-items
 Content-Type: application/json
 
 {
-  "orderId": 2,
+  "orderId": 1,
   "productId": 6,
-  "quantity": 4
+  "quantity": 10
 }
 ###List
 GET http://localhost:8080/api/order-items

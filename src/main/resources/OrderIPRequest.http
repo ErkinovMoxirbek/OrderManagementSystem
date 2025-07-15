@@ -3,8 +3,8 @@ POST http://localhost:8080/api/orders
 Content-Type: application/json
 
 {
-  "customerName": "Kali",
-  "customerEmail": "Kyevmail.uz",
+  "customerName": "Vali",
+  "customerEmail": "Vali@mail.ru",
   "totalAmount": "0.0"
 }
 ###List
@@ -18,7 +18,7 @@ DELETE http://localhost:8080/api/orders/8
 
 ###changeStatusById
 
-PUT http://localhost:8080/api/orders/1/PENDING
+PUT http://localhost:8080/api/orders/1/CANCELLED
 
 ###getAllByEmail
 GET http://localhost:8080/api/orders/customer/Valiyevmail

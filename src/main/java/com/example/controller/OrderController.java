@@ -57,7 +57,7 @@ public class OrderController {
 
     //getAllByEmail
     @GetMapping(value = "/customer/{email}")
-    public ResponseEntity<List<OrderDTO>> getCustomerOrders( @PathVariable String email) {
+    public ResponseEntity<OrderDTO> getCustomerOrders( @PathVariable String email) {
         return ResponseEntity.ok(orderService.getOrdersByEmail(email));
     }
 }
