@@ -1,6 +1,6 @@
 package com.example.dto;
 
-import com.example.status.OrderStatus;
+import com.example.enums.OrderStatus;
 
 import java.time.LocalDateTime;
 

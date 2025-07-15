@@ -1,4 +1,4 @@
-package com.example.status;
+package com.example.enums;
 
 public enum OrderStatus {
     PENDING, CONFIRMED, SHIPPED, DELIVERED, CANCELLED

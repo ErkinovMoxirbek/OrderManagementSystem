@@ -1,5 +1,6 @@
 package com.example.controller;
 
+import com.example.dto.OrderItemDTO;
 import com.example.entity.OrderEntity;
 import com.example.entity.OrderItemEntity;
 import com.example.service.OrderItemService;
@@ -22,7 +23,7 @@ public class OrderItemController {
         return ResponseEntity.ok(orderItemService.add(entity));
     }
     @GetMapping
-    public ResponseEntity<List<OrderItemEntity>> getAllOrders() {
+    public ResponseEntity<List<OrderItemDTO>> getAllOrders() {
         return ResponseEntity.ok(orderItemService.getAll());
     }
 

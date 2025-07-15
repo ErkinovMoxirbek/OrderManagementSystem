@@ -12,7 +12,7 @@ Content-Type: application/json
 GET http://localhost:8080/api/products
 
 ###Get
-GET http://localhost:8080/api/products/1
+GET http://localhost:8080/api/products/3
 
 ###updateById
 

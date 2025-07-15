@@ -12,8 +12,8 @@ import lombok.NoArgsConstructor;
 @Data
 public class OrderItemDTO {
     private Long id;
-    private OrderEntity order;
-    private ProductEntity product;
+    private Long orderId;
+    private Long productId;
     private Integer quantity;
     private Double unitPrice;
     private Double totalPrice;
