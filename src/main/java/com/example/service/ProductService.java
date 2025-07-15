@@ -1,11 +1,8 @@
 package com.example.service;
 
-import com.example.dto.OrderDTO;
 import com.example.dto.ProductDTO;
-import com.example.entity.OrderEntity;
 import com.example.entity.ProductEntity;
 import com.example.repository.ProductRepository;
-import com.example.status.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +16,7 @@ public class ProductService {
     public ProductEntity add(ProductEntity productEntity) {
         ProductEntity productEntity1 = productRepository.findByName(productEntity.getName());
         if (productEntity1 != null) {
-            System.out.println(productEntity1.toString());
+            System.out.println(productEntity1);
             productEntity1.setStock(productEntity.getStock() + productEntity1.getStock());
             productEntity1.setPrice(productEntity.getPrice());
             return productRepository.save(productEntity1);

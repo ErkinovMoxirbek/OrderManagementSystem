@@ -3,28 +3,27 @@ package com.example.controller;
 import com.example.dto.OrderDTO;
 import com.example.entity.OrderEntity;
 import com.example.service.OrderService;
-import com.example.status.OrderStatus;
-import org.hibernate.query.Order;
+import com.example.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-
 @RestController
 @RequestMapping(value = "/api/orders")
+@Validated
 public class OrderController {
     @Autowired
     private OrderService orderService;
 
     //Add
     @PostMapping
-    public ResponseEntity<OrderEntity> addOrder(@Valid @RequestBody OrderEntity orderEntity) {
-        System.out.println(orderEntity.toString());
-        return ResponseEntity.ok(orderService.addOrder(orderEntity));
+    public ResponseEntity<OrderDTO> addOrder( @RequestBody @Valid OrderDTO orderDTO) {
+        System.out.println(orderDTO.toString());
+        return ResponseEntity.ok(orderService.addOrder(orderDTO));
     }
 
     //List
@@ -58,7 +57,7 @@ public class OrderController {
 
     //getAllByEmail
     @GetMapping(value = "/customer/{email}")
-    public ResponseEntity<List<OrderDTO>> getCustomerOrders(@PathVariable String email) {
+    public ResponseEntity<List<OrderDTO>> getCustomerOrders( @PathVariable String email) {
         return ResponseEntity.ok(orderService.getOrdersByEmail(email));
     }
 }

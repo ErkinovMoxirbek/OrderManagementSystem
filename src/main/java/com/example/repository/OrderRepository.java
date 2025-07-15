@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
-
+    OrderEntity findByCustomerEmail(String customerEmail);
 
     @Query("""
         SELECT new com.example.dto.OrderDTO(

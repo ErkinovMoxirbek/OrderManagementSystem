@@ -3,10 +3,10 @@ POST http://localhost:8080/api/products
 Content-Type: application/json
 
 {
-  "name": "Pepsi",
-  "price": 12000,
+  "name": "Non",
+  "price": 5000,
   "stock": "12",
-  "category": "Gazli SUV"
+  "category": "Hamir"
 }
 ###List
 GET http://localhost:8080/api/products
