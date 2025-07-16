@@ -49,4 +49,8 @@ public class ProductService {
     public ProductDTO getByNameAndCategory(String name, String category) {
         return productRepository.searchByNameAndCategoryDTO(name,category);
     }
+
+    public List<ProductDTO> getByName(String name) {
+        return productRepository.findByNameDTO(name);
+    }
 }

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mahsulotlar</title>
+    <link rel="stylesheet" href="css/product.css">
+</head>
+<body>
+
+<h1>Mahsulotlar ro'yxati</h1>
+
+<!-- 🔍 Qidiruv formasi -->
+<div class="form-container">
+    <input type="text" id="searchInput" placeholder="Qidiruv...">
+    <button onclick="searchProducts()">Qidirish</button>
+</div>
+
+<!-- ➕ Mahsulot qo'shish formasi -->
+<div class="form-container">
+    <input type="text" id="nameInput" placeholder="Mahsulot nomi">
+    <input type="number" id="priceInput" placeholder="Narxi">
+    <button onclick="addProduct()">Qo'shish</button>
+</div>
+
+<!-- 📄 Mahsulotlar ro'yxati -->
+<div class="product-list" id="productList">
+    Yuklanmoqda...
+</div>
+
+<script src="js/product.js"></script>
+</body>
+</html>

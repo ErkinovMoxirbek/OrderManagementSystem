@@ -45,7 +45,23 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
     """)
     ProductDTO findByIdDTO(@Param("id") Long id);
 
-@Query("""
+    @Query("""
+        SELECT new com.example.dto.ProductDTO(
+            p.id,
+            p.name,
+            p.price,
+            p.stock,
+            p.category,
+            p.isActive,
+            p.createdAt
+        )
+        FROM ProductEntity p
+        WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))
+    """)
+    List<ProductDTO> findByNameDTO(@Param("name") String name);
+
+
+    @Query("""
         SELECT new com.example.dto.ProductDTO(
             p.id,
             p.name,

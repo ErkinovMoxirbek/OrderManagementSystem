@@ -2,17 +2,16 @@ package com.example.dto;
 
 import com.example.enums.ProfileRole;
 import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class JwtDTO {
+public class AuthResponseDTO {
+    private String name;
+    private String surname;
     private String email;
     private ProfileRole role;
-
-
+    private String jwtToken;
 }
