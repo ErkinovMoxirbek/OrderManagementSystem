@@ -17,16 +17,14 @@ import java.util.List;
 @Getter @Setter
 public class CustomUserDetails implements UserDetails {
 
-    private String name;
-    private String surname;
+    private String fullName;
     private String email;
     private String password;
     private ProfileRole role;
     private GeneralStatus status;
 
     public CustomUserDetails(ProfileEntity profile) {
-        this.name = profile.getName();
-        this.surname = profile.getName();
+        this.fullName = profile.getFullName();
         this.password = profile.getPassword();
         this.role = profile.getRole();
         this.status = profile.getStatus();

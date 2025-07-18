@@ -1,24 +1,26 @@
 package com.example.service;
 
 import com.example.dto.OrderDTO;
+import com.example.dto.create.OrderCreateDTO;
 import com.example.entity.OrderEntity;
 import com.example.entity.OrderItemEntity;
 import com.example.entity.ProductEntity;
+import com.example.entity.ProfileEntity;
 import com.example.exception.BadRequestException;
-import com.example.exception.OrderAlreadyExistsException;
 import com.example.exception.OrderNotFoundException;
 import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 import com.example.enums.OrderStatus;
 import com.example.repository.ProductRepository;
+import com.example.repository.ProfileRepository;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -29,29 +31,28 @@ public class OrderService {
     private ProductRepository productRepository;
     @Autowired
     private OrderItemRepository orderItemRepository;
+    @Autowired
+    private ProfileService profileService;
+    @Autowired
+    private ProfileRepository profileRepository;
     //Log
     private static final Logger logger = LoggerFactory.getLogger(OrderItemService.class);
 
-    public OrderDTO addOrder(OrderDTO orderDTO) {
-        String email = orderDTO.getCustomerEmail();
-        if (email != null && !isValidEmail(email)) {
-            logger.warn("Email is not valid {}", email);
-            throw new BadRequestException("Email format is incorrect.: " + email);
+    public OrderDTO addOrder(OrderCreateDTO orderCreateDTO) {
+        Optional<ProfileEntity> profileEntity = profileRepository.findByEmail(orderCreateDTO.getEmail());
+        if (profileEntity.isEmpty()) {
+            logger.error("Profile not found");
+            throw new BadRequestException("Profile not found");
         }
-        if (orderRepository.findByCustomerEmail(email) != null && orderRepository.findAllByCustomerEmail(email).getOrderStatus().equals(OrderStatus.PENDING)) {
-            logger.debug("Order is already exists {}", email);
-            throw new OrderAlreadyExistsException(email);
-        }
-        if (orderDTO.getCustomerName().length() < 3) {
-            logger.warn("Customer name is too short {}", orderDTO.getCustomerName());
-            throw new BadRequestException("The customer's name is not valid.");
-        }
-        OrderEntity orderEntity = orderRepository.save(toEntity(orderDTO));
+        OrderEntity orderEntity = orderRepository.save(toEntity(orderCreateDTO));
+        System.out.println(orderEntity);
+        OrderDTO orderDTO = new OrderDTO();
         orderDTO.setId(orderEntity.getId());
         orderDTO.setOrderStatus(orderEntity.getOrderStatus());
         orderDTO.setOrderDate(orderEntity.getOrderDate());
         orderDTO.setTotalAmount(orderEntity.getTotalAmount());
-        logger.info("Order added: {}", orderDTO.toString());
+        orderDTO.setEmail(orderEntity.getProfileEntity().getEmail());
+        logger.info("Order added: {}", orderDTO);
         return orderDTO;
     }
 
@@ -66,7 +67,7 @@ public class OrderService {
         return orderRepository.findByIdDTO(id);
     }
 
-    public OrderDTO updateService(Long id, OrderStatus orderStatus) {
+    public OrderDTO updateOrder(Long id, OrderStatus orderStatus) {
         if (!orderRepository.existsById(id)) {
             logger.warn("Order not found {}", id);
             throw new OrderNotFoundException(id);
@@ -75,13 +76,12 @@ public class OrderService {
         orderEntity.setOrderStatus(orderStatus);
         if (OrderStatus.CANCELLED.equals(orderStatus)) {
             ProductEntity productEntity = productRepository.findById(id).get();
-            OrderItemEntity orderItemEntity = orderItemRepository.findById(id).get();
             revertingStocks(productRepository.findAll(),orderItemRepository.findAllByOrderId(orderEntity.getId()));
             orderEntity.setOrderStatus(OrderStatus.CANCELLED);
             productRepository.save(productEntity);
             orderRepository.save(orderEntity);
         }
-        logger.info("Order updated {}", orderEntity.toString());
+        logger.info("Order updated {}", orderEntity);
         return orderRepository.findByIdDTO(id);
     }
     public void revertingStocks (List<ProductEntity> productEntities , List<OrderItemEntity> orderItemEntities){
@@ -100,7 +100,7 @@ public class OrderService {
     public Boolean deleteOrder(Long id) {
         OrderEntity orderEntity = orderRepository.findById(id).orElse(null);
         if (orderEntity != null) {
-            logger.info("Order deleted {}", orderEntity.toString());
+            logger.info("Order deleted {}", orderEntity);
             orderRepository.delete(orderEntity);
             return true;
         }
@@ -108,21 +108,18 @@ public class OrderService {
     }
 
     public OrderDTO getOrdersByEmail(String email) {
-        if (!isValidEmail(email)) {
+        if (!profileService.isValidEmail(email)) {
             logger.warn("Email is not valid {}", email);
             throw new BadRequestException("Email format is incorrect.: " + email);
         }
         return orderRepository.findAllByCustomerEmail(email);
     }
 
-    public boolean isValidEmail(String email) {
-        return EmailValidator.getInstance().isValid(email);
-    }
 
-    public OrderEntity toEntity(OrderDTO orderDTO) {
+
+    public OrderEntity toEntity(OrderCreateDTO orderDTO) {
         OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setCustomerName(orderDTO.getCustomerName());
-        orderEntity.setCustomerEmail(orderDTO.getCustomerEmail());
+        orderEntity.setProfileEntity(profileRepository.findByEmail(orderDTO.getEmail()).get());
         return orderEntity;
     }
 

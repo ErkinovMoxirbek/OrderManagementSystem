@@ -2,6 +2,8 @@ package com.example.controller;
 
 import com.example.dto.OrderDTO;
 import com.example.dto.ProductDTO;
+import com.example.dto.create.ProductCreateDTO;
+import com.example.dto.update.ProductUpdateDTO;
 import com.example.entity.ProductEntity;
 import com.example.service.OrderService;
 import com.example.service.ProductService;
@@ -22,10 +24,13 @@ public class ProductController {
 
     //Add
     @PostMapping
-    public ResponseEntity<ProductEntity> add( @Valid @RequestBody ProductEntity productEntity) {
-
-        System.out.println(productEntity.toString());
-        return ResponseEntity.ok(productService.add(productEntity));
+    public ResponseEntity<ProductDTO> add( @Valid @RequestBody ProductCreateDTO productCreateDTO) {
+        return ResponseEntity.ok(productService.add(productCreateDTO));
+    }
+    //Update
+    @PutMapping("/{id}")
+    public ResponseEntity<ProductDTO> update(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.updateById(id));
     }
 
     //List

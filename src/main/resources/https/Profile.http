@@ -1,2 +1,14 @@
-### getProfile
-http://localhost:8080/api/
+### add
+POST http://localhost:8080/api/profile/registration
+Content-Type: application/json
+
+{
+  "fullName": "Moxirbek",
+  "email": "erkinov@email.uz",
+  "password": "123"
+}
+### get
+GET http://localhost:8080/api/profile/erkinov@email.uz
+
+### getAll
+GET http://localhost:8080/api/profile

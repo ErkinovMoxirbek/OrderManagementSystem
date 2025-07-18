@@ -1,10 +1,12 @@
 package com.example.service;
 
 import com.example.dto.OrderItemDTO;
+import com.example.dto.create.OrderItemCreateDTO;
 import com.example.entity.OrderEntity;
 import com.example.entity.OrderItemEntity;
 import com.example.entity.ProductEntity;
 import com.example.exception.BadRequestException;
+import com.example.exception.NotFoundException;
 import com.example.exception.OrderNotFoundException;
 import com.example.exception.ProductNotFoundException;
 import com.example.repository.OrderItemRepository;
@@ -32,31 +34,54 @@ public class OrderItemService {
     //Log
     private static final Logger logger = LoggerFactory.getLogger(OrderItemService.class);
 
-        public OrderItemDTO add(@Valid OrderItemDTO dto) {
-            logger.info("OrderItemDTO: {}", dto);
-            orderService.checkStatus(orderRepository.findByIdDTO(dto.getOrderId()));
-            if (dto.getQuantity() < 1 ||
-                    !productRepository.findById(dto.getProductId()).get().getIsActive() ||
-                    productRepository.findById(dto.getProductId()).get().getStock() < dto.getQuantity() ) {
-                logger.warn("Product unsuitable: {}", dto);
-                throw new BadRequestException("Product unsuitable!");
+        public OrderItemDTO add(@Valid OrderItemCreateDTO orderItemCreateDTO) {
+
+            if (orderItemCreateDTO.getQuantity() == null || orderItemCreateDTO.getQuantity() <= 0) {
+                logger.warn("Quantity must be greater than 0 your quantity: {}" , orderItemCreateDTO.getQuantity());
+                throw new BadRequestException("Quantity must be greater than 0 your quantity: " + orderItemCreateDTO.getQuantity());
             }
 
+
+            //creatDTOdan malumotlarni dtogakochirish
+            OrderItemDTO dto = new OrderItemDTO();
+            dto.setOrderId(orderItemCreateDTO.getOrderId());
+            dto.setProductId(orderItemCreateDTO.getProductId());
+            dto.setQuantity(orderItemCreateDTO.getQuantity());
+
+            //valid product and order
+            if (orderItemCreateDTO.getProductId() == null || orderItemCreateDTO.getOrderId() == null) {
+                logger.warn("Order or Product not found is Order id: {}", orderItemCreateDTO.getOrderId()+ ", Product id: " + orderItemCreateDTO.getProductId());
+                throw new BadRequestException("Order or Product Bad request --> Order id: " + orderItemCreateDTO.getOrderId()+ ", Product id: " + orderItemCreateDTO.getProductId());
+            }
             ProductEntity productEntity = productRepository.findById(dto.getProductId())
                     .orElseThrow(() -> {
                         logger.error("Product not found: {}", dto.getProductId());
                         return new ProductNotFoundException(dto.getProductId());
                     });
+            if (!productEntity.getIsActive() ||
+                    productEntity.getStock() < dto.getQuantity()){
+                logger.warn("We do not have the quantity or product in stock: {}" , dto.getQuantity());
+                throw new BadRequestException("We do not have the quantity or product in stock: " + dto.getQuantity());
+
+            }
 
             OrderEntity orderEntity = orderRepository.findById(dto.getOrderId())
                     .orElseThrow(() -> {
                         logger.error("Order not found: {}", dto.getOrderId());
                         return new OrderNotFoundException(dto.getOrderId());
                     });
-            //Order Item yoq bolsa
+
+
+            orderService.checkStatus(orderRepository.findByIdDTO(dto.getOrderId()));
+
+
+
+
             OrderItemEntity orderItemEntity = orderItemRepository.findByOrderIdAndProductId(dto.getOrderId(), dto.getProductId());
+
             logger.debug("OrderItem lookup: orderId={}, productId={}, found={}", dto.getOrderId(), dto.getProductId(), orderItemEntity != null);
 
+            //Order Item yoq bolsa
             if (orderItemEntity == null) {
                 logger.info("Creating new OrderItem for orderId={}, productId={}", dto.getOrderId(), dto.getProductId());
                 orderItemEntity = new OrderItemEntity();
@@ -71,7 +96,6 @@ public class OrderItemService {
                 productRepository.save(productEntity);
 
                 // order total amountni oshirish
-                System.out.println(orderEntity);
                 orderEntity.setTotalAmount(orderEntity.getTotalAmount() + orderItemEntity.getTotalPrice());
 
             }else {
@@ -79,7 +103,7 @@ public class OrderItemService {
                 orderItemEntity.setQuantity(orderItemEntity.getQuantity() + dto.getQuantity());
                 orderItemEntity.setUnitPrice(productEntity.getPrice());
                 productEntity.setStock(productEntity.getStock() - dto.getQuantity());
-                orderEntity.setTotalAmount(orderItemEntity.getUnitPrice() * orderItemEntity.getQuantity());
+                orderEntity.setTotalAmount(productEntity.getPrice() * orderItemEntity.getQuantity());
                 orderItemEntity.setTotalPrice(orderEntity.getTotalAmount());
             }
 
@@ -104,13 +128,5 @@ public class OrderItemService {
     }
 
 
-    private OrderItemEntity toEntity(@Valid OrderItemDTO dto) {
-        OrderItemEntity orderItemEntity = new OrderItemEntity();
-        orderItemEntity.setOrderId(dto.getOrderId());
-        orderItemEntity.setProductId(dto.getProductId());
-        orderItemEntity.setQuantity(dto.getQuantity());
-        orderItemEntity.setUnitPrice(dto.getUnitPrice());
-        orderItemEntity.setTotalPrice(dto.getTotalPrice());
-        return orderItemEntity;
-    }
+
 }

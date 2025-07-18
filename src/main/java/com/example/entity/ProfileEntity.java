@@ -5,6 +5,8 @@ import com.example.enums.ProfileRole;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -19,11 +21,9 @@ public class ProfileEntity {
     @GenericGenerator(name = "uuid-hibernate-generator", strategy = "org.hibernate.id.UUIDGenerator")
     private String id;
 
-    @Column(name = "name")
-    private String name;
+    @Column(name = "full_name")
+    private String fullName;
 
-    @Column(name = "surname")
-    private String surname;
 
     @Column(name = "email")
     private String email;
@@ -37,10 +37,15 @@ public class ProfileEntity {
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
-    private ProfileRole role;
+    private ProfileRole role = ProfileRole.CUSTOMER;
 
     @Column(name = "visible")
     private Boolean visible = Boolean.TRUE;
     @Column(name = "created_date")
     private LocalDateTime createdDate = LocalDateTime.now();
+
+    @OneToMany
+    private List<OrderEntity> profileOrders;
+
+
 }

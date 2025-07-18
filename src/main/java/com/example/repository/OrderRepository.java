@@ -2,19 +2,19 @@ package com.example.repository;
 
 import com.example.dto.OrderDTO;
 import com.example.entity.OrderEntity;
+import com.example.entity.ProfileEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
-    OrderEntity findByCustomerEmail(String customerEmail);
+    OrderEntity findByProfileEntity(ProfileEntity profileEntity);
 
     @Query("""
         SELECT new com.example.dto.OrderDTO(
             o.id,
-            o.customerName,
-            o.customerEmail,
+            o.profileEntity.email,
             o.orderDate,
             o.orderStatus,
             o.totalAmount
@@ -27,21 +27,19 @@ public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
     @Query("""
         SELECT new com.example.dto.OrderDTO(
             o.id,
-            o.customerName,
-            o.customerEmail,
+            o.profileEntity.email,
             o.orderDate,
             o.orderStatus,
             o.totalAmount
         )
         FROM OrderEntity o
-        where o.customerEmail = :email
+        where o.profileEntity.email = :email
     """)
     OrderDTO findAllByCustomerEmail(String email);
    @Query("""
         SELECT new com.example.dto.OrderDTO(
             o.id,
-            o.customerName,
-            o.customerEmail,
+            o.profileEntity.email,
             o.orderDate,
             o.orderStatus,
             o.totalAmount

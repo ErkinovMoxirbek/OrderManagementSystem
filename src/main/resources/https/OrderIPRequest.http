@@ -3,8 +3,7 @@ POST http://localhost:8080/api/orders
 Content-Type: application/json
 
 {
-  "customerName": "Vali",
-  "customerEmail": "Vali@mail.ru"
+  "email": "erkinov@email.uz"
 }
 ###List
 GET http://localhost:8080/api/orders

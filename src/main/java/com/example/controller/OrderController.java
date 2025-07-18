@@ -1,7 +1,7 @@
 package com.example.controller;
 
 import com.example.dto.OrderDTO;
-import com.example.entity.OrderEntity;
+import com.example.dto.create.OrderCreateDTO;
 import com.example.service.OrderService;
 import com.example.enums.OrderStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,9 +21,8 @@ public class OrderController {
 
     //Add
     @PostMapping
-    public ResponseEntity<OrderDTO> addOrder( @RequestBody @Valid OrderDTO orderDTO) {
-        System.out.println(orderDTO.toString());
-        return ResponseEntity.ok(orderService.addOrder(orderDTO));
+    public ResponseEntity<OrderDTO> addOrder( @RequestBody @Valid OrderCreateDTO orderCreateDTO) {
+        return ResponseEntity.ok(orderService.addOrder(orderCreateDTO));
     }
 
     //List
@@ -41,7 +40,7 @@ public class OrderController {
     //ById changeStatus
     @PutMapping(value = "/{id}/{status}")
     public ResponseEntity<OrderDTO> updateOrder(@PathVariable Long id, @PathVariable OrderStatus status) {
-        OrderDTO student = orderService.updateService(id,status);
+        OrderDTO student = orderService.updateOrder(id,status);
         return ResponseEntity.ok(student);
     }
 

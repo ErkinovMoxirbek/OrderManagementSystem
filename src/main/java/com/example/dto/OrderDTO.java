@@ -17,10 +17,8 @@ import java.time.LocalDateTime;
 public class OrderDTO {
     private Long id;
     @NotBlank
-    private String customerName;
+    private String email;
     @NotBlank
-    @Email
-    private String customerEmail;
     private LocalDateTime orderDate;
     private OrderStatus orderStatus;
     private Double totalAmount;

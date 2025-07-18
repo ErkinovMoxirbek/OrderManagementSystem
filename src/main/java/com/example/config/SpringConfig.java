@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -67,9 +68,15 @@ public class SpringConfig {
         return http
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .anyRequest().permitAll()  // HAMMA REQUESTGA RUXSAT
+//                        .requestMatchers(
+//                                "/", "/css/**", "/js/**", "/images/**",
+//                                "/h2-console/**",
+//                                "/swagger-ui/**", "/v3/api-docs/**",
+//                                "/api/auth/**"
+////                                "/api/products"
+//                        ).permitAll().anyRequest().authenticated()
                 )
                 .build();
     }
@@ -82,18 +89,7 @@ public class SpringConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new PasswordEncoder() {
-            @Override
-            public String encode(CharSequence rawPassword) {
-                return rawPassword.toString();
-            }
-
-            @Override
-            public boolean matches(CharSequence rawPassword, String encodedPassword) {
-                String md5 = MD5Util.getMd5(rawPassword.toString());
-                return md5.equals(encodedPassword);
-            }
-        };
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
