@@ -1,33 +1,58 @@
 <!DOCTYPE html>
-<html lang="uz">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mahsulotlar</title>
-    <link rel="stylesheet" href="css/product.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/product.css">nk
 </head>
 <body>
 
-<h1>Mahsulotlar ro'yxati</h1>
-
-<!-- 🔍 Qidiruv formasi -->
-<div class="form-container">
-    <input type="text" id="searchInput" placeholder="Qidiruv...">
-    <button onclick="searchProducts()">Qidirish</button>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8">
+            <div class="d-flex justify-content-between align-items-center">
+                <h3>Mahsulotlar</h3>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">➕ Yangi mahsulot</button>
+            </div>
+            <div id="productList" class="row g-3 mt-3">
+                <!-- mahsulotlar shu yerga -->
+            </div>
+        </div>
+        <div class="col-md-4">
+            <h3>Savatcha 🛒</h3>
+            <ul id="cartList" class="list-group mb-3">
+                <!-- savatcha -->
+            </ul>
+            <button class="btn btn-success w-100 mb-2">Tolov</button>
+            <button class="btn btn-danger w-100" onclick="cancelOrder()">Bekor qilish</button>
+        </div>
+    </div>
 </div>
 
-<!-- ➕ Mahsulot qo'shish formasi -->
-<div class="form-container">
-    <input type="text" id="nameInput" placeholder="Mahsulot nomi">
-    <input type="number" id="priceInput" placeholder="Narxi">
-    <button onclick="addProduct()">Qo'shish</button>
+<!-- Modal -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Yangi Mahsulot Qo‘shish</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <input id="nameInput" class="form-control mb-2" placeholder="Nom">
+                <input id="stockInput" class="form-control mb-2" placeholder="Soni" type="number" min="1">
+                <input id="priceInput" class="form-control mb-2" placeholder="Narxi" type="number" min="0">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Bekor qilish</button>
+                <button type="button" class="btn btn-primary" onclick="addProduct()">Saqlash</button>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- 📄 Mahsulotlar ro'yxati -->
-<div class="product-list" id="productList">
-    Yuklanmoqda...
-</div>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/product.js"></script>
 </body>
 </html>

@@ -8,6 +8,8 @@ import com.example.entity.ProfileEntity;
 import com.example.repository.ProfileRepository;
 import com.example.util.JwtUtil;
 import com.example.util.MD5Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -28,10 +30,12 @@ public class ProfileService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private AuthenticationManager authenticationManager;
-
+    //Log
+    private static final Logger logger = LoggerFactory.getLogger(OrderItemService.class);
     public ProfileDTO registration(ProfileDTO dto) {
         Optional<ProfileEntity> optional = profileRepository.findByEmailAndVisibleTrue(dto.getEmail());
         if (optional.isPresent()) {
+            logger.error("Profile null");
             return null;
         }
 

@@ -11,7 +11,6 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
-import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -28,58 +27,53 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableWebSecurity
 public class SpringConfig {
 
-
     @Autowired
     private UserDetailsService userDetailsService;
-    @Autowired
-    private JwtAuthenticationFilter jwtTokenFilter;
 
     public static final String[] AUTH_WHITELIST = {
             "/profile/registration",
             "/profile/authorization",
+            "/api/**" // shu yerga ham qo‘shib qo‘ydim
     };
 
     @Bean
     public AuthenticationProvider authenticationProvider() {
-        // authentication (login,password)
         final DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
         authenticationProvider.setUserDetailsService(userDetailsService);
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // authorization
-        http.authorizeHttpRequests(authorizationManagerRequestMatcherRegistry -> {
-            authorizationManagerRequestMatcherRegistry
-                    .requestMatchers(AUTH_WHITELIST).permitAll()
-                    .requestMatchers(
-                            "/",                         // static/index.html
-                            "/css/**", "/js/**", "/images/**", // static resurslar
-                            "/h2-console/**",            // H2
-                            "/swagger-ui/**", "/v3/api-docs/**",  // swagger
-                            "/api/**"             // bu endpoint
-                    ).permitAll()
-                    .anyRequest()
-                    .authenticated();
-        }).addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class);
-        ;
-
-        http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(httpSecurityCorsConfigurer -> {
-            CorsConfiguration configuration = new CorsConfiguration();
-            configuration.setAllowedOriginPatterns(Arrays.asList("*"));
-            configuration.setAllowedMethods(Arrays.asList("*"));
-            configuration.setAllowedHeaders(Arrays.asList("*"));
-
-            UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-            source.registerCorsConfiguration("/**", configuration);
-            httpSecurityCorsConfigurer.configurationSource(source);
-        });
-        return http.build();
+//        http
+//                .csrf(csrf -> csrf.disable())
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+//                .authorizeHttpRequests(auth -> auth
+//                        .requestMatchers(
+//                                "/", "/css/**", "/js/**", "/images/**",
+//                                "/h2-console/**",
+//                                "/swagger-ui/**", "/v3/api-docs/**",
+//                                "/api/products"
+//                        ).permitAll()
+//                        .anyRequest().authenticated()
+//                )
+//                .headers(headers -> headers
+//                        .frameOptions(frameOptions -> frameOptions.disable())
+//                )
+//                .formLogin(withDefaults());
+//
+//        return http.build();
+        return http
+                .csrf(csrf -> csrf.disable())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+                .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        .anyRequest().permitAll()  // HAMMA REQUESTGA RUXSAT
+                )
+                .build();
     }
+
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
@@ -87,7 +81,7 @@ public class SpringConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() { // passwordlarni shifirlab database-da saqlash uchun
+    public PasswordEncoder passwordEncoder() {
         return new PasswordEncoder() {
             @Override
             public String encode(CharSequence rawPassword) {

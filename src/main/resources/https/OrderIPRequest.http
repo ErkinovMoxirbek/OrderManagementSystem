@@ -4,8 +4,7 @@ Content-Type: application/json
 
 {
   "customerName": "Vali",
-  "customerEmail": "Vali@mail.ru",
-  "totalAmount": "0.0"
+  "customerEmail": "Vali@mail.ru"
 }
 ###List
 GET http://localhost:8080/api/orders

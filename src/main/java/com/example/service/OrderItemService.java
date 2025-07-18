@@ -10,6 +10,8 @@ import com.example.exception.ProductNotFoundException;
 import com.example.repository.OrderItemRepository;
 import com.example.repository.OrderRepository;
 import com.example.repository.ProductRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,66 +29,75 @@ public class OrderItemService {
     private OrderRepository orderRepository;
     @Autowired
     private OrderService orderService;
+    //Log
+    private static final Logger logger = LoggerFactory.getLogger(OrderItemService.class);
 
-    public OrderItemDTO add(@Valid OrderItemDTO dto) {
-        orderService.checkStatus(orderRepository.findByIdDTO(dto.getOrderId()));
-        if (dto.getQuantity() < 1 ||
-                !productRepository.findById(dto.getProductId()).get().getIsActive() ||
-                productRepository.findById(dto.getProductId()).get().getStock() < dto.getQuantity() ) {
-            throw new BadRequestException("Product unsuitable!");
-        }
+        public OrderItemDTO add(@Valid OrderItemDTO dto) {
+            logger.info("OrderItemDTO: {}", dto);
+            orderService.checkStatus(orderRepository.findByIdDTO(dto.getOrderId()));
+            if (dto.getQuantity() < 1 ||
+                    !productRepository.findById(dto.getProductId()).get().getIsActive() ||
+                    productRepository.findById(dto.getProductId()).get().getStock() < dto.getQuantity() ) {
+                logger.warn("Product unsuitable: {}", dto);
+                throw new BadRequestException("Product unsuitable!");
+            }
 
-        ProductEntity productEntity = productRepository.findById(dto.getProductId())
-                .orElseThrow(() -> new ProductNotFoundException(dto.getProductId()));
+            ProductEntity productEntity = productRepository.findById(dto.getProductId())
+                    .orElseThrow(() -> {
+                        logger.error("Product not found: {}", dto.getProductId());
+                        return new ProductNotFoundException(dto.getProductId());
+                    });
 
-        OrderEntity orderEntity = orderRepository.findById(dto.getOrderId())
-                .orElseThrow(() -> new OrderNotFoundException(dto.getOrderId()));
+            OrderEntity orderEntity = orderRepository.findById(dto.getOrderId())
+                    .orElseThrow(() -> {
+                        logger.error("Order not found: {}", dto.getOrderId());
+                        return new OrderNotFoundException(dto.getOrderId());
+                    });
+            //Order Item yoq bolsa
+            OrderItemEntity orderItemEntity = orderItemRepository.findByOrderIdAndProductId(dto.getOrderId(), dto.getProductId());
+            logger.debug("OrderItem lookup: orderId={}, productId={}, found={}", dto.getOrderId(), dto.getProductId(), orderItemEntity != null);
 
-        //Order Item yoq bolsa
-        OrderItemEntity orderItemEntity = orderItemRepository.findByOrderIdAndProductId(dto.getOrderId(), dto.getProductId());
-        System.out.println(dto.getOrderId() + " " + dto.getProductId());
-        System.out.println(orderItemEntity);
-        if (orderItemEntity == null) {
-            System.out.println("OrderItem create!");
-            orderItemEntity = new OrderItemEntity();
-            // narxlarni hisoblash
-            orderItemEntity.setUnitPrice(productEntity.getPrice());
-            orderItemEntity.setTotalPrice(productEntity.getPrice() * dto.getQuantity());
-            orderItemEntity.setProductId(dto.getProductId());
-            orderItemEntity.setOrderId(dto.getOrderId());
-            orderItemEntity.setQuantity(dto.getQuantity());
-            // product stockni kamaytirish
-            productEntity.setStock(productEntity.getStock() - dto.getQuantity());
+            if (orderItemEntity == null) {
+                logger.info("Creating new OrderItem for orderId={}, productId={}", dto.getOrderId(), dto.getProductId());
+                orderItemEntity = new OrderItemEntity();
+                // narxlarni hisoblash
+                orderItemEntity.setUnitPrice(productEntity.getPrice());
+                orderItemEntity.setTotalPrice(productEntity.getPrice() * dto.getQuantity());
+                orderItemEntity.setProductId(dto.getProductId());
+                orderItemEntity.setOrderId(dto.getOrderId());
+                orderItemEntity.setQuantity(dto.getQuantity());
+                // product stockni kamaytirish
+                productEntity.setStock(productEntity.getStock() - dto.getQuantity());
+                productRepository.save(productEntity);
+
+                // order total amountni oshirish
+                System.out.println(orderEntity);
+                orderEntity.setTotalAmount(orderEntity.getTotalAmount() + orderItemEntity.getTotalPrice());
+
+            }else {
+                logger.info("Updating existing OrderItem for orderId={}, productId={}", dto.getOrderId(), dto.getProductId());
+                orderItemEntity.setQuantity(orderItemEntity.getQuantity() + dto.getQuantity());
+                orderItemEntity.setUnitPrice(productEntity.getPrice());
+                productEntity.setStock(productEntity.getStock() - dto.getQuantity());
+                orderEntity.setTotalAmount(orderItemEntity.getUnitPrice() * orderItemEntity.getQuantity());
+                orderItemEntity.setTotalPrice(orderEntity.getTotalAmount());
+            }
+
+            dto.setUnitPrice(orderItemEntity.getUnitPrice());
+            dto.setTotalPrice(orderItemEntity.getTotalPrice());
+            dto.setQuantity(orderItemEntity.getQuantity());
+
+            orderRepository.save(orderEntity);
+            orderItemRepository.save(orderItemEntity);
+            dto.setId(orderEntity.getId());
+            if (productEntity.getStock() == 0) {
+                logger.info("Product stock is now zero; deactivating productId={}", productEntity.getId());
+                productEntity.setIsActive(false);
+            }
             productRepository.save(productEntity);
-
-            // order total amountni oshirish
-            System.out.println(orderEntity);
-            orderEntity.setTotalAmount(orderEntity.getTotalAmount() + orderItemEntity.getTotalPrice());
-
-        }else {
-            System.out.println("Product update!");
-            orderItemEntity.setQuantity(orderItemEntity.getQuantity() + dto.getQuantity());
-            orderItemEntity.setUnitPrice(productEntity.getPrice());
-            productEntity.setStock(productEntity.getStock() - dto.getQuantity());
-            orderEntity.setTotalAmount(orderItemEntity.getUnitPrice() * orderItemEntity.getQuantity());
-            orderItemEntity.setTotalPrice(orderEntity.getTotalAmount());
+            logger.info("OrderItem successfully added: {}", dto);
+            return dto;
         }
-
-        dto.setUnitPrice(orderItemEntity.getUnitPrice());
-        dto.setTotalPrice(orderItemEntity.getTotalPrice());
-        dto.setQuantity(orderItemEntity.getQuantity());
-
-        orderRepository.save(orderEntity);
-        orderItemRepository.save(orderItemEntity);
-        dto.setId(orderEntity.getId());
-        if (productEntity.getStock() == 0) {
-            System.out.println("Product is empty!");
-            productEntity.setIsActive(false);
-        }
-        productRepository.save(productEntity);
-
-        return dto;
-    }
 
     public List<OrderItemDTO> getAll() {
         return orderItemRepository.findAllDTO();

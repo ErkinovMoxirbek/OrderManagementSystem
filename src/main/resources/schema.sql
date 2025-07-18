@@ -34,7 +34,7 @@ CREATE TABLE IF NOT EXISTS order_items
     order_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
     quantity INT NOT NULL,
-    price DOUBLE NOT NULL,
+    price DOUBLE ,
     FOREIGN KEY(order_id) REFERENCES orders(id) ON DELETE CASCADE,
     FOREIGN KEY(product_id) REFERENCES products(id)ON DELETE CASCADE
     );

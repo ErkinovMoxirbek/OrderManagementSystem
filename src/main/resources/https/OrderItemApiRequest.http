@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "orderId": 1,
-  "productId": 6,
+  "productId": 2,
   "quantity": 10
 }
 ###List

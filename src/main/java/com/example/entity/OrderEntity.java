@@ -25,7 +25,7 @@ public class OrderEntity {
 
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus = OrderStatus.PENDING;
-    private Double totalAmount;
+    private Double totalAmount = 0.0;
 
     @OneToMany
     private List<OrderItemEntity> orderItems;
