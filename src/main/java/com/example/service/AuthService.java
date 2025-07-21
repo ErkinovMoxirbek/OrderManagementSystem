@@ -78,6 +78,7 @@ public class AuthService {
         response.setFullName(profile.getFullName());
         response.setEmail(profile.getEmail());
         response.setRole(profile.getRole());
+
         response.setJwtToken(JwtUtil.encode(profile.getEmail(), profile.getRole()));
         return response;
     }

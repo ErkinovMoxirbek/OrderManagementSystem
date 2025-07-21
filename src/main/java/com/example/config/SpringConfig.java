@@ -1,6 +1,5 @@
 package com.example.config;
 
-import com.example.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,9 +22,6 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.Arrays;
-
-import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
 @EnableWebSecurity
@@ -54,16 +50,46 @@ public class SpringConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
+                        // Auth
+                        .requestMatchers("/api/auth/registration", "/api/auth/login","/ws/**", "/topic/**", "/app/**").permitAll()
+
+                        // Products
+                        .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/products/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/products/**").hasRole("ADMIN")
+
+                        // Orders
+                        .requestMatchers(HttpMethod.POST, "/api/orders/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole("ADMIN")
+
+                        // OrderItems
+                        .requestMatchers("/api/order-items/**").authenticated()
+
+                        // Profile
+                        .requestMatchers(HttpMethod.POST, "/api/profile/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/profile/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/profile/**").authenticated()
+                        .requestMatchers(HttpMethod.DELETE, "/api/profile/**").hasRole("ADMIN")
+
+                        // Websocket (Chat)
+                        .requestMatchers("/chat/**", "/topic/**").authenticated()
+
+                        // Swagger, H2
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/h2-console/**").permitAll()
+
+                        // STATIC FILES
                         .requestMatchers(
-                                "/",  "/ws-chat/**","/css/**", "/js/**", "/images/**",
-                                "/h2-console/**",
-                                "/swagger-ui/**", "/v3/api-docs/**",
-                                "api/auth/**"
+                                "/", "/index.html","/admin.html","/user.html", "/css/**", "/js/**", "/images/**"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET,"/api/products/**").permitAll()
-                        .requestMatchers(HttpMethod.POST,"/api/products/**").hasRole("ADMIN")
+                        //chat
+                        .requestMatchers("/api/chat/rooms")
+                        .hasRole("ADMIN")
+
+                        // Boshqalar
                         .anyRequest().authenticated()
-//                                .anyRequest().permitAll()
                 )
                 .headers(headers -> headers
                         .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
