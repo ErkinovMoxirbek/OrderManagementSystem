@@ -4,6 +4,7 @@ import com.example.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -11,6 +12,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,11 +33,11 @@ public class SpringConfig {
 
     @Autowired
     private UserDetailsService userDetailsService;
-
+    @Autowired
+    private JwtAuthenticationFilter jwtAuthFilter;
     public static final String[] AUTH_WHITELIST = {
             "/profile/registration",
-            "/profile/authorization",
-            "/api/**" // shu yerga ham qo‘shib qo‘ydim
+            "/api/auth/**"
     };
 
     @Bean
@@ -47,38 +50,29 @@ public class SpringConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf(csrf -> csrf.disable())
-//                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-//                .authorizeHttpRequests(auth -> auth
-//                        .requestMatchers(
-//                                "/", "/css/**", "/js/**", "/images/**",
-//                                "/h2-console/**",
-//                                "/swagger-ui/**", "/v3/api-docs/**",
-//                                "/api/products"
-//                        ).permitAll()
-//                        .anyRequest().authenticated()
-//                )
-//                .headers(headers -> headers
-//                        .frameOptions(frameOptions -> frameOptions.disable())
-//                )
-//                .formLogin(withDefaults());
-//
-//        return http.build();
-        return http
-                .csrf(csrf -> csrf.disable())
+        http
+                .csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        .anyRequest().permitAll()  // HAMMA REQUESTGA RUXSAT
-//                        .requestMatchers(
-//                                "/", "/css/**", "/js/**", "/images/**",
-//                                "/h2-console/**",
-//                                "/swagger-ui/**", "/v3/api-docs/**",
-//                                "/api/auth/**"
-////                                "/api/products"
-//                        ).permitAll().anyRequest().authenticated()
+                        .requestMatchers(
+                                "/",  "/ws-chat/**","/css/**", "/js/**", "/images/**",
+                                "/h2-console/**",
+                                "/swagger-ui/**", "/v3/api-docs/**",
+                                "api/auth/**"
+                        ).permitAll()
+                        .requestMatchers(HttpMethod.GET,"/api/products/**").permitAll()
+                        .requestMatchers(HttpMethod.POST,"/api/products/**").hasRole("ADMIN")
+                        .anyRequest().authenticated()
+//                                .anyRequest().permitAll()
                 )
-                .build();
+                .headers(headers -> headers
+                        .frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)
+                )
+                .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+                .formLogin(AbstractHttpConfigurer::disable);
+
+        return http.build();
     }
 
 

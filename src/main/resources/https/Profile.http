@@ -1,6 +1,7 @@
 ### add
 POST http://localhost:8080/api/profile/registration
 Content-Type: application/json
+Authorization: Bearer {{jwt}}
 
 {
   "fullName": "Moxirbek",
@@ -9,6 +10,17 @@ Content-Type: application/json
 }
 ### get
 GET http://localhost:8080/api/profile/erkinov@email.uz
+Authorization: Bearer {{jwt}}
 
 ### getAll
 GET http://localhost:8080/api/profile
+Authorization: Bearer {{jwt}}
+
+###
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "",
+  "password": ""
+}

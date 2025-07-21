@@ -48,7 +48,7 @@ public class ProductService {
         productEntity.setCategory(productCreateDTO.getCategory());
         ProductEntity productEntity1 = productRepository.findByName(productEntity.getName());
         //agar mahsulot bor bolsa qoshmay kopaytirib qoyadi
-         if (productEntity1.getStock() > 0) {
+         if (productEntity1 != null && productEntity1.getStock() > 0) {
             productEntity1.setStock(productEntity.getStock() + productEntity1.getStock());
             productEntity1.setPrice(productEntity.getPrice());
             productEntity1.setIsActive(true);

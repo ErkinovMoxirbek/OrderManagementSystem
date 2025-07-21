@@ -108,7 +108,7 @@ public class OrderService {
     }
 
     public OrderDTO getOrdersByEmail(String email) {
-        if (!profileService.isValidEmail(email)) {
+        if (profileService.isValidEmail(email)) {
             logger.warn("Email is not valid {}", email);
             throw new BadRequestException("Email format is incorrect.: " + email);
         }

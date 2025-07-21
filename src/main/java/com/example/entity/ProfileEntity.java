@@ -9,12 +9,14 @@ import java.util.List;
 
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import org.hibernate.annotations.GenericGenerator;
 
 @Getter
 @Setter
 @Entity
 @Table(name = "profile")
+@ToString
 public class ProfileEntity {
     @Id
     @GeneratedValue(generator = "uuid-hibernate-generator")

@@ -10,6 +10,7 @@ import com.example.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -25,6 +26,8 @@ public class ProductController {
     //Add
     @PostMapping
     public ResponseEntity<ProductDTO> add( @Valid @RequestBody ProductCreateDTO productCreateDTO) {
+        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
+        System.out.println("Product qo‘shayotgan: " + currentUser);
         return ResponseEntity.ok(productService.add(productCreateDTO));
     }
     //Update

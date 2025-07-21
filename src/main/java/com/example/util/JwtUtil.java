@@ -40,7 +40,7 @@ public class JwtUtil {
                 .parseSignedClaims(token)
                 .getPayload();
         String email = (String) claims.get("email");
-        ProfileRole role = (ProfileRole) claims.get("role");
+        ProfileRole role = ProfileRole.valueOf(claims.get("role").toString());
         return new JwtDTO(email, role);
     }
 

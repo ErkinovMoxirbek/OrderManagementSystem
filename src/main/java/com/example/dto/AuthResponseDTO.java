@@ -10,7 +10,6 @@ import lombok.Setter;
 @Setter
 public class AuthResponseDTO {
     private String fullName;
-    private String surname;
     private String email;
     private ProfileRole role;
     private String jwtToken;

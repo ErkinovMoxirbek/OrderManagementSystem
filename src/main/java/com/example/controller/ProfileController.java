@@ -18,16 +18,9 @@ public class ProfileController {
     @Autowired
     private ProfileService profileService;
 
-    @PostMapping("/registration")
-    public ResponseEntity<ProfileDTO> create(@RequestBody ProfileCreateDTO dto) {
-        ProfileDTO result = profileService.registration(dto);
-        return ResponseEntity.ok(result);
-    }
-
-    @PostMapping("/authorization")
-    public ResponseEntity<AuthResponseDTO> authorization(@RequestBody AuthRequestDTO dto) {
-        AuthResponseDTO result = profileService.authorization(dto);
-        return ResponseEntity.ok(result);
+    @PostMapping
+    public ResponseEntity<ProfileDTO> createProfile(@RequestBody ProfileCreateDTO profileCreateDTO) {
+        return ResponseEntity.ok(profileService.creatProfile(profileCreateDTO));
     }
     @GetMapping("/{email}")
     public ResponseEntity<ProfileDTO> getProfile(@PathVariable String email) {
