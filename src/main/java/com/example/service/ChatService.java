@@ -1,20 +1,37 @@
 package com.example.service;
 
+import com.example.dto.MessageDTO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
 public class ChatService {
-    private final Set<String> activeRooms = Collections.synchronizedSet(new HashSet<>());
 
-    public void addRoom(String roomId) {
-        activeRooms.add(roomId);
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    private final String PREFIX = "chat:";
+    private final String ROOMS_KEY = "chat:rooms";
+
+    public void saveMessage(String roomId, MessageDTO message) {
+        // Xabarni saqlash
+        redisTemplate.opsForList().rightPush(PREFIX + roomId, message);
+        // roomId ni rooms setiga qo‘shish
+        redisTemplate.opsForSet().add(ROOMS_KEY, roomId);
     }
 
-    public Set<String> getAllActiveRooms() {
-        return activeRooms;
+    public List<MessageDTO> getMessages(String roomId) {
+        List<Object> list = redisTemplate.opsForList().range(PREFIX + roomId, 0, -1);
+        return list.stream()
+                .map(obj -> (MessageDTO) obj)
+                .toList();
+    }
+
+    public Set<Object> getAllRooms() {
+        return redisTemplate.opsForSet().members(ROOMS_KEY);
     }
 }

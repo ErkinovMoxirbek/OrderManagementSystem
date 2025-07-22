@@ -85,9 +85,9 @@ public class SpringConfig {
                                 "/", "/index.html","/admin.html","/user.html", "/css/**", "/js/**", "/images/**"
                         ).permitAll()
                         //chat
-                        .requestMatchers("/api/chat/rooms")
+                        .requestMatchers(HttpMethod.GET,"/api/chat/rooms")
                         .hasRole("ADMIN")
-
+                        .requestMatchers(HttpMethod.GET,"/api/chat/rooms/**").hasRole("ADMIN")
                         // Boshqalar
                         .anyRequest().authenticated()
                 )

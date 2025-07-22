@@ -66,6 +66,7 @@ public class AuthService {
 
 
     public AuthResponseDTO authorization(AuthRequestDTO auth) {
+        isValidEmail(auth.getEmail());
         Optional<ProfileEntity> optional = profileRepository.findByEmailAndVisibleTrue(auth.getEmail());
         if (optional.isEmpty()) {
             throw new NotFoundException("Profile Not found");

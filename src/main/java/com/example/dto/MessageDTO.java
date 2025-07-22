@@ -5,12 +5,15 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @ToString
-public class ChatMessageDTO {
-    private String sender;
-    private String content;
-    private String roomId;
+public class MessageDTO {
+    private String id;
+    private String from;
+    private String text;
+    private LocalDateTime createdDate;
 }
