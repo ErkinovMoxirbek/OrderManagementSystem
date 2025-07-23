@@ -69,12 +69,14 @@ public class SpringConfig {
                         .requestMatchers("/api/order-items/**").authenticated()
 
                         // Profile
+                        .requestMatchers(HttpMethod.GET, "/api/profile/change-password/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/profile/change-password/**").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/api/profile/change-password/form/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/profile/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/profile/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/profile/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/profile/**").authenticated()
+
 
                         // Websocket (Chat)
                         .requestMatchers("/chat/**", "/topic/**").authenticated()

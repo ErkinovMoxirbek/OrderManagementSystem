@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/profiles")
+@RequestMapping(value = "/api/profile")
 public class ProfileController {
     @Autowired
     private ProfileService profileService;

@@ -143,7 +143,7 @@ public class ProfileService {
     public String changePassword(String token, String password) {
         String email;
         try {
-            JwtDTO jwtDTO = JwtUtil.decode(token);
+            JwtDTO jwtDTO = JwtUtil.decodeRegistrationToken(token);
             email = jwtDTO.getEmail();
         } catch (Exception e) {
             throw new RuntimeException("Token noto‘g‘ri yoki eskirgan!");
