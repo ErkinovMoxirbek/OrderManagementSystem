@@ -24,13 +24,11 @@ public class OrderEntity {
     private ProfileEntity profileEntity;
     @Column(name = "order_date")
     private LocalDateTime orderDate = LocalDateTime.now();
-
     @Enumerated(EnumType.STRING)
     @Column(name = "order_status")
     private OrderStatus orderStatus = OrderStatus.PENDING;
     @Column(name = "total_amount")
     private Double totalAmount = 0.0;
-
     @OneToMany
     private List<OrderItemEntity> orderItems;
 

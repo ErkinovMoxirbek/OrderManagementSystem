@@ -30,4 +30,9 @@ public class ProfileController {
     public ResponseEntity<List<ProfileDTO>> getAll() {
         return ResponseEntity.ok(profileService.getAll());
     }
+
+    @DeleteMapping("/{email}")
+    public ResponseEntity<Boolean> deleteProfile(@PathVariable String email) {
+        return ResponseEntity.ok(profileService.deleteProfile(email));
+    }
 }

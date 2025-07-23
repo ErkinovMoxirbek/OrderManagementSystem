@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,9 +38,16 @@ public class ProductService {
             logger.error("Product category is empty");
             throw new BadRequestException("Product category cannot be empty");
         }
-        if (productCreateDTO.getPrice() == null || productCreateDTO.getPrice() < 0){
-            logger.error("Product price is short zero : {}" , productCreateDTO.getPrice());
-            throw new BadRequestException("Product price cannot be less than zero");
+        if (productRepository.findByName(productCreateDTO.getName()) != null) {
+            ProductEntity productEntity = productRepository.findByName(productCreateDTO.getName());
+            productEntity.setStock(productEntity.getStock() + productCreateDTO.getStock());
+            productEntity.setCategory(productEntity.getCategory() + productCreateDTO.getCategory());
+            productEntity.setIsActive(true);
+            productEntity.setCreatedAt(LocalDateTime.now());
+            productEntity.setVisible(true);
+            productRepository.save(productEntity);
+            logger.info("Product added successfully");
+            return toDTO(productEntity);
         }
         ProductEntity productEntity = new ProductEntity();
         productEntity.setName(productCreateDTO.getName());
@@ -73,7 +81,9 @@ public class ProductService {
         ProductEntity productEntity = productRepository.findById(id).orElse(null);
         if(productEntity != null) {
             logger.info("Delete product by id: {}", id);
-            productRepository.delete(productEntity);
+            productEntity.setVisible(false);
+            productEntity.setIsActive(false);
+            productRepository.save(productEntity);
             return true;
         }
         return false;

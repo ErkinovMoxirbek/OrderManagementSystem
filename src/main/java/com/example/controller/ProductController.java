@@ -26,8 +26,6 @@ public class ProductController {
     //Add
     @PostMapping
     public ResponseEntity<ProductDTO> add( @Valid @RequestBody ProductCreateDTO productCreateDTO) {
-        String currentUser = SecurityContextHolder.getContext().getAuthentication().getName();
-        System.out.println("Product qo‘shayotgan: " + currentUser);
         return ResponseEntity.ok(productService.add(productCreateDTO));
     }
     //Update

@@ -27,6 +27,8 @@ public class ProductEntity {
     private String category;
     @Column(name = "is_active")
     private Boolean isActive = Boolean.TRUE;
+    @Column(name = "visible")
+    private Boolean visible = Boolean.TRUE;
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 

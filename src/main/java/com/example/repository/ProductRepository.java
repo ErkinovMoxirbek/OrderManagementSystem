@@ -26,7 +26,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.isActive,
             p.createdAt
         )
-        FROM ProductEntity p
+        FROM ProductEntity p where p.visible = true
     """)
     List<ProductDTO> findAllDTO();
 
@@ -41,7 +41,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.createdAt
         )
         FROM ProductEntity p
-        where p.id = :id
+        where p.id = :id and p.visible = true
     """)
     ProductDTO findByIdDTO(@Param("id") Long id);
 
@@ -56,7 +56,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.createdAt
         )
         FROM ProductEntity p
-        WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%'))
+        WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) and p.visible = true
     """)
     List<ProductDTO> findByNameDTO(@Param("name") String name);
 
@@ -72,7 +72,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.createdAt
         )
         FROM ProductEntity p
-        where p.name = :name and p.category = :category and p.isActive = :isActive
+        where p.name = :name and p.category = :category and p.visible = true
     """)
     ProductDTO searchByNameAndCategoryDTO(@Param("name") String name, @Param("category") String category);
 

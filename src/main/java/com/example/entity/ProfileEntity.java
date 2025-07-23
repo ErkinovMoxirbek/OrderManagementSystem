@@ -43,6 +43,10 @@ public class ProfileEntity {
 
     @Column(name = "visible")
     private Boolean visible = Boolean.TRUE;
+
+    @Column(name = "verified")
+    private Boolean verified = Boolean.FALSE;
+
     @Column(name = "created_date")
     private LocalDateTime createdDate = LocalDateTime.now();
 

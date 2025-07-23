@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ProfileRepository extends JpaRepository<ProfileEntity, String> {
 
-    Optional<ProfileEntity> findByEmailAndVisibleTrue(String phone);
+    Optional<ProfileEntity> findByEmailAndVisibleTrue(String email);
     @Query("""
         SELECT new com.example.dto.ProfileDTO(
             o.id,
@@ -20,7 +20,7 @@ public interface ProfileRepository extends JpaRepository<ProfileEntity, String> 
             o.role
         )
         FROM ProfileEntity o
-        WHERE o.email = :email
+        WHERE o.email = :email and o.visible = true
     """)
     ProfileDTO findByEmailDTO(String email);
     @Query("""
@@ -31,7 +31,7 @@ public interface ProfileRepository extends JpaRepository<ProfileEntity, String> 
             o.password,
             o.role
         )
-        FROM ProfileEntity o
+        FROM ProfileEntity o where o.visible = true
     """)
     List<ProfileDTO> findAllDTO();
 
