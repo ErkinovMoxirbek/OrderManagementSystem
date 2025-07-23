@@ -13,6 +13,6 @@ import lombok.Setter;
 public class JwtDTO {
     private String email;
     private ProfileRole role;
-
+    private String unique;
 
 }

@@ -51,7 +51,7 @@ public class SpringConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
                         // Auth
-                        .requestMatchers("/api/auth/registration", "/api/auth/login","/ws/**", "/topic/**", "/app/**").permitAll()
+                        .requestMatchers( "/api/auth/**","/ws/**", "/topic/**", "/app/**").permitAll()
 
                         // Products
                         .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
@@ -62,17 +62,19 @@ public class SpringConfig {
                         // Orders
                         .requestMatchers(HttpMethod.POST, "/api/orders/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
-                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/orders/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/orders/**").hasRole("ADMIN")
 
                         // OrderItems
                         .requestMatchers("/api/order-items/**").authenticated()
 
                         // Profile
-                        .requestMatchers(HttpMethod.POST, "/api/profile/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/profile/**").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.GET, "/api/profile/change-password/form/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/profile/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/profile/**").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/profile/**").authenticated()
-                        .requestMatchers(HttpMethod.DELETE, "/api/profile/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/profile/**").authenticated()
 
                         // Websocket (Chat)
                         .requestMatchers("/chat/**", "/topic/**").authenticated()
@@ -82,7 +84,7 @@ public class SpringConfig {
 
                         // STATIC FILES
                         .requestMatchers(
-                                "/", "/index.html","/admin.html","/user.html", "/css/**", "/js/**", "/images/**"
+                                "/", "/index.html","/admin.html","/user.html", "/css/**", "/js/**", "/images/**","/change-password.html"
                         ).permitAll()
                         //chat
                         .requestMatchers(HttpMethod.GET,"/api/chat/rooms")

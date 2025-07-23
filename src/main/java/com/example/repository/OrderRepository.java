@@ -9,7 +9,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<OrderEntity, Long> {
-    OrderEntity findByProfileEntityAndVisibleTrue(ProfileEntity profileEntity);
 
     @Query("""
         SELECT new com.example.dto.OrderDTO(

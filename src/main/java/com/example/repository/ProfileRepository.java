@@ -10,7 +10,7 @@ import java.util.Optional;
 
 public interface ProfileRepository extends JpaRepository<ProfileEntity, String> {
 
-    Optional<ProfileEntity> findByEmailAndVisibleTrue(String email);
+    Optional<ProfileEntity> findByEmailAndVisibleFalse(String email);
     @Query("""
         SELECT new com.example.dto.ProfileDTO(
             o.id,
@@ -35,5 +35,5 @@ public interface ProfileRepository extends JpaRepository<ProfileEntity, String> 
     """)
     List<ProfileDTO> findAllDTO();
 
-    Optional<ProfileEntity> findByEmail(String email);
+    Optional<ProfileEntity> findByEmailAndVisibleTrue(String email);
 }

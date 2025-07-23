@@ -39,7 +39,7 @@ public class OrderService {
     private static final Logger logger = LoggerFactory.getLogger(OrderItemService.class);
 
     public OrderDTO addOrder(OrderCreateDTO orderCreateDTO) {
-        Optional<ProfileEntity> profileEntity = profileRepository.findByEmail(orderCreateDTO.getEmail());
+        Optional<ProfileEntity> profileEntity = profileRepository.findByEmailAndVisibleTrue(orderCreateDTO.getEmail());
         if (profileEntity.isEmpty()) {
             logger.error("Profile not found");
             throw new BadRequestException("Profile not found");
@@ -119,7 +119,7 @@ public class OrderService {
 
     public OrderEntity toEntity(OrderCreateDTO orderDTO) {
         OrderEntity orderEntity = new OrderEntity();
-        orderEntity.setProfileEntity(profileRepository.findByEmail(orderDTO.getEmail()).get());
+        orderEntity.setProfileEntity(profileRepository.findByEmailAndVisibleTrue(orderDTO.getEmail()).get());
         return orderEntity;
     }
 

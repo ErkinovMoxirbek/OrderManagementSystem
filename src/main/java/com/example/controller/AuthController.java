@@ -8,10 +8,7 @@ import com.example.service.AuthService;
 import com.example.service.ProfileService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "api/auth")
@@ -21,14 +18,17 @@ public class AuthController {
     @Autowired
     private AuthService authService;
     @PostMapping("/registration")
-    public ResponseEntity<ProfileDTO> create(@RequestBody ProfileCreateDTO dto) {
-        ProfileDTO result = authService.registration(dto);
-        return ResponseEntity.ok(result);
+    public ResponseEntity<String> create(@RequestBody ProfileCreateDTO dto) {
+        return ResponseEntity.ok(authService.registration(dto));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDTO> authorization(@RequestBody AuthRequestDTO dto) {
         AuthResponseDTO result = authService.authorization(dto);
         return ResponseEntity.ok(result);
+    }
+    @GetMapping("/registration/email/verification/{token}")
+    public ResponseEntity<String> registration(@PathVariable("token") String token) {
+        return ResponseEntity.ok(authService.regEmailVerification(token));
     }
 }

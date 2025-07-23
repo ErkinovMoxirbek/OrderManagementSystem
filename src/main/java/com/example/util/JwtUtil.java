@@ -41,11 +41,41 @@ public class JwtUtil {
                 .getPayload();
         String email = (String) claims.get("email");
         ProfileRole role = ProfileRole.valueOf(claims.get("role").toString());
-        return new JwtDTO(email, role);
+        String unique = (String) claims.get("unique");
+        return new JwtDTO(email, role, unique);
     }
 
     private static SecretKey getSignInKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
+    }
+
+    public static String encodeForRegistration(String email, String unique) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("unique", unique);
+
+        return Jwts
+                .builder()
+                .claims(extraClaims)
+                .subject(email)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + tokenLiveTime))
+                .signWith(getSignInKey())
+                .compact();
+    }
+
+    public static JwtDTO decodeRegistrationToken(String token) {
+        Claims claims = Jwts
+                .parser()
+                .verifyWith(getSignInKey())
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+        String email = claims.getSubject();
+        String unique = (String) claims.get("unique");
+        JwtDTO jwtDTO = new JwtDTO();
+        jwtDTO.setEmail(email);
+        jwtDTO.setUnique(unique);
+        return jwtDTO;
     }
 }

@@ -2,14 +2,20 @@ package com.example.service;
 
 import com.example.dto.AuthRequestDTO;
 import com.example.dto.AuthResponseDTO;
+import com.example.dto.JwtDTO;
 import com.example.dto.ProfileDTO;
 import com.example.dto.create.ProfileCreateDTO;
 import com.example.entity.ProfileEntity;
+import com.example.enums.GeneralStatus;
 import com.example.exception.BadRequestException;
 import com.example.exception.NotFoundException;
 import com.example.exception.OrderAlreadyExistsException;
 import com.example.repository.ProfileRepository;
+import com.example.service.email.EmailHistoryService;
+import com.example.service.email.EmailSenderService;
 import com.example.util.JwtUtil;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,10 +34,15 @@ public class AuthService {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ProfileRepository profileRepository;
+    @Autowired
+    private EmailHistoryService emailHistoryService;
+    @Autowired
+    private EmailSenderService emailSenderService;
+
     //Log
     private static final Logger logger = LoggerFactory.getLogger(OrderItemService.class);
 
-    public ProfileDTO registration(ProfileCreateDTO profileCreateDTO) {
+    public String registration(ProfileCreateDTO profileCreateDTO) {
         ProfileDTO dto = new ProfileDTO();
         dto.setFullName(profileCreateDTO.getFullName());
         dto.setEmail(profileCreateDTO.getEmail());
@@ -59,9 +70,9 @@ public class AuthService {
         entity.setEmail(dto.getEmail());
         entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         profileRepository.save(entity);
-        dto.setId(entity.getId());
-        dto.setRole(entity.getRole());
-        return dto;
+        emailSenderService.sendRegistrationStyledEmail(profileCreateDTO.getEmail());// profile emailiga verfi link jonab ketadi!
+        return "Verifikatsiya kodi " + entity.getEmail() + " manziliga yuborildi. Iltimos, pochtangizni tekshiring!";
+
     }
 
 
@@ -75,6 +86,13 @@ public class AuthService {
         if (passwordEncoder.matches(auth.getPassword(), profile.getPassword())) {
             throw new NotFoundException("Password Wrong");
         }
+        if (profile.getVerified() == null){
+            emailSenderService.sendRegistrationStyledEmail(profile.getEmail());
+            throw new BadRequestException("No verified: Email send verified link");
+        }
+        if (!profile.getVerified() && !profile.getVisible()){
+            throw new BadRequestException("Account Not Verified : " + auth.getEmail());
+        }
         AuthResponseDTO response = new AuthResponseDTO();
         response.setFullName(profile.getFullName());
         response.setEmail(profile.getEmail());
@@ -86,5 +104,34 @@ public class AuthService {
 
     public boolean isValidEmail(String email) {
         return EmailValidator.getInstance().isValid(email);
+    }
+
+    public String regEmailVerification(String token) {
+        JwtDTO jwtDTO = null;
+        try {
+            jwtDTO = JwtUtil.decodeRegistrationToken(token);
+        } catch (ExpiredJwtException e) {
+            throw new BadRequestException("JWT Expired");
+        } catch (JwtException e) {
+            throw new BadRequestException("JWT Not Valid");
+        }
+        String email = jwtDTO.getEmail();
+
+        Optional<ProfileEntity> existOptional = profileRepository.findByEmailAndVisibleTrue(email);
+        if (existOptional.isEmpty()) {
+            throw new BadRequestException("Email not found");
+        }
+        ProfileEntity profile = existOptional.get();
+        if (!profile.getStatus().equals(GeneralStatus.NOACTIVE)) {
+            throw new BadRequestException("Email int wrong status");
+        }
+        // check fo sms code and time
+        if (emailHistoryService.isSmsSendToAccount(email, jwtDTO.getUnique())) {
+            profile.setStatus(GeneralStatus.ACTIVE);
+            profile.setVerified(true);
+            profileRepository.save(profile);
+            return "Verification successfully completed";
+        }
+        throw new BadRequestException("Not completed");
     }
 }

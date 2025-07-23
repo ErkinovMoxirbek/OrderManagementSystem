@@ -35,7 +35,7 @@ public class ProfileEntity {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private GeneralStatus status = GeneralStatus.ACTIVE;
+    private GeneralStatus status = GeneralStatus.NOACTIVE;
 
     @Column(name = "role")
     @Enumerated(EnumType.STRING)
