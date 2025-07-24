@@ -86,7 +86,7 @@ public class SpringConfig {
 
                         // STATIC FILES
                         .requestMatchers(
-                                "/", "/index.html","/admin.html","/user.html", "/css/**", "/js/**", "/images/**","/change-password.html"
+                                "/", "/test.html","/admin.html","/user.html", "/css/**", "/js/**", "/images/**","/change-password.html"
                         ).permitAll()
                         //chat
                         .requestMatchers(HttpMethod.GET,"/api/chat/rooms")

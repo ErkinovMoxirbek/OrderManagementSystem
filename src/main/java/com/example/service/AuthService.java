@@ -70,6 +70,10 @@ public class AuthService {
             throw new NotFoundException("Profile Not found");
         }
         ProfileEntity profile = optional.get();
+        // bu profile passni encodelash sababi test datalarimizda encodelanmagan pass kiritilgan
+        if (profile.getPassword().length() == 6){
+            profile.setPassword(passwordEncoder.encode(auth.getPassword()));
+        }
         if (!passwordEncoder.matches(auth.getPassword(), profile.getPassword())) {
             throw new NotFoundException("Password Wrong");
         }

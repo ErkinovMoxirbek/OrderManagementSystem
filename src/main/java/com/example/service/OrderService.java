@@ -63,6 +63,11 @@ public class OrderService {
     }
 
     public OrderDTO getOrderId(Long id) {
+        Optional<OrderEntity> orderEntity = orderRepository.findById(id);
+        if (orderEntity.isEmpty()) {
+            logger.error("Order not found");
+            throw new OrderNotFoundException(id);
+        }
         logger.info("Get order id {}", id);
         return orderRepository.findByIdDTO(id);
     }
