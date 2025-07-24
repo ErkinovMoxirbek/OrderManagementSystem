@@ -36,49 +36,6 @@ public class ProfileService {
     @Autowired
     private EmailSenderService emailSenderService;
 
-    public ProfileDTO creatProfile(ProfileCreateDTO profileCreateDTO) {
-        if (profileCreateDTO == null){
-            throw new NotFoundException("profile is null");
-        }
-        if (!EmailValidator.getInstance().isValid(profileCreateDTO.getEmail())) {
-            throw new BadRequestException("Invalid email address");
-        }
-        if (profileCreateDTO.getPassword() == null || profileCreateDTO.getPassword().length() < 6) {
-            throw new BadRequestException("Password must be at least 6 characters");
-        }
-        if (profileCreateDTO.getFullName() == null || profileCreateDTO.getFullName().length() < 3) {
-            throw new BadRequestException("Full name must be at least 3 characters");
-        }
-        // Agar profile mavjud bolsa mavjud profileni update qilish
-        if (profileRepository.findByEmailAndVisibleFalse(profileCreateDTO.getEmail()).isPresent() && !profileRepository.findByEmailAndVisibleFalse(profileCreateDTO.getEmail()).get().getVisible()) {
-            ProfileEntity profileEntity = profileRepository.findByEmailAndVisibleFalse(profileCreateDTO.getEmail()).get();
-            profileEntity.setPassword(passwordEncoder.encode(profileCreateDTO.getPassword()));
-            profileEntity.setFullName(profileCreateDTO.getFullName());
-            profileEntity.setVisible(true);
-            profileEntity.setStatus(GeneralStatus.ACTIVE);
-            profileRepository.save(profileEntity);
-            ProfileDTO profileDTO = new ProfileDTO();
-            profileDTO.setId(profileEntity.getId());
-            profileDTO.setEmail(profileCreateDTO.getEmail());
-            profileDTO.setFullName(profileCreateDTO.getFullName());
-            profileDTO.setPassword(passwordEncoder.encode(profileCreateDTO.getPassword()));
-            profileDTO.setRole(profileEntity.getRole());
-            return profileDTO;
-        }
-        //Profile create
-        ProfileEntity profileEntity = new ProfileEntity();
-        profileEntity.setEmail(profileCreateDTO.getEmail());
-        profileEntity.setFullName(profileCreateDTO.getFullName());
-        profileEntity.setPassword(profileCreateDTO.getPassword());
-        profileRepository.save(profileEntity);
-        ProfileDTO profileDTO = new ProfileDTO();
-        profileDTO.setId(profileEntity.getId());
-        profileDTO.setEmail(profileCreateDTO.getEmail());
-        profileDTO.setFullName(profileCreateDTO.getFullName());
-        profileDTO.setPassword(passwordEncoder.encode(profileCreateDTO.getPassword()));
-        profileDTO.setRole(profileEntity.getRole());
-        return profileDTO;
-    }
     public ProfileDTO getByEmail(String email) {
         if (isValidEmail(email)) {
             logger.warn("Email is not valid {}", email);
