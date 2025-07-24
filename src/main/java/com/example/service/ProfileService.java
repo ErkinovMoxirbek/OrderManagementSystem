@@ -105,14 +105,9 @@ public class ProfileService {
         } catch (Exception e) {
             throw new RuntimeException("Token noto‘g‘ri yoki eskirgan!");
         }
-
-        //Userni topish
         ProfileEntity profile = profileRepository.findByEmailAndVisibleTrue(email)
                 .orElseThrow(() -> new RuntimeException("Foydalanuvchi topilmadi"));
-
-        //Parolni encoder bilan kodlash
         profile.setPassword(passwordEncoder.encode(password));
-
         profileRepository.save(profile);
         return "Profile password changed";
     }

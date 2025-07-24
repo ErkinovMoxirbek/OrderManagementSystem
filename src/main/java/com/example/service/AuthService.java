@@ -83,7 +83,7 @@ public class AuthService {
             throw new NotFoundException("Profile Not found");
         }
         ProfileEntity profile = optional.get();
-        if (passwordEncoder.matches(auth.getPassword(), profile.getPassword())) {
+        if (!passwordEncoder.matches(auth.getPassword(), profile.getPassword())) {
             throw new NotFoundException("Password Wrong");
         }
         if (profile.getVerified() == null){
