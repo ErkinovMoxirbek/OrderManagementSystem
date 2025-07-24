@@ -4,10 +4,8 @@ import com.example.dto.AuthRequestDTO;
 import com.example.dto.AuthResponseDTO;
 import com.example.dto.JwtDTO;
 import com.example.dto.ProfileDTO;
-import com.example.dto.create.ProfileCreateDTO;
 import com.example.dto.update.ProfileUpdateDTO;
 import com.example.entity.ProfileEntity;
-import com.example.enums.GeneralStatus;
 import com.example.exception.BadRequestException;
 import com.example.exception.NotFoundException;
 import com.example.repository.ProfileRepository;
@@ -17,9 +15,11 @@ import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.LinkedList;
 import java.util.List;
 
 @Service
@@ -85,6 +85,7 @@ public class ProfileService {
         return dto;
     }
 
+
     public String updatePassword(String email, AuthRequestDTO dto) {
         AuthResponseDTO dto1 = authService.authorization(dto);
         if (dto1 == null) {
@@ -112,4 +113,15 @@ public class ProfileService {
     }
 
 
+    public PageImpl<ProfileDTO> pagination(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdDate").descending());
+        Page<ProfileEntity> result = profileRepository.findAllPage(pageable);
+
+        List<ProfileDTO> dtoList = new LinkedList<>();
+        for (ProfileEntity profile : result.getContent()) {
+            ProfileDTO dto = new ProfileDTO(profile.getId(),profile.getFullName(),profile.getEmail(), profile.getPassword(),profile.getRole());
+            dtoList.add(dto);
+        }
+        return new PageImpl<>(dtoList, pageable, result.getTotalElements());
+    }
 }

@@ -4,7 +4,6 @@ import com.example.dto.ProductDTO;
 import com.example.dto.create.ProductCreateDTO;
 import com.example.dto.update.ProductUpdateDTO;
 import com.example.entity.ProductEntity;
-import com.example.exception.BadRequestException;
 import com.example.exception.InsufficientStockException;
 import com.example.exception.NotFoundException;
 import com.example.repository.ProductRepository;
@@ -12,9 +11,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,16 +53,24 @@ public class ProductService {
         return toDTO(productRepository.save(productEntity));
     }
 
-    public List<ProductDTO> getAll() {
-        logger.info("Get all products");
-        return productRepository.findAllDTO();
-    }
+    public PageImpl<ProductDTO> getAll(int page, int size) {
+            Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+            Page<ProductEntity> result = productRepository.findAllByVisibleTrue(pageable);
 
+            List<ProductDTO> dtoList = new LinkedList<>();
+            for (ProductEntity product: result.getContent()) {
+                ProductDTO dto = new ProductDTO(product.getId(),product.getName(),product.getPrice(),product.getStock(),product.getCategory(),product.getIsActive());
+                dtoList.add(dto);
+            }
+            logger.info("Get all products");
+            return new PageImpl<>(dtoList, pageable, result.getTotalElements());
+    }
+    @Cacheable(value = "products", key = "#id")
     public ProductDTO getById(Long id) {
         logger.info("Get product by id: {}", id);
         return productRepository.findByIdDTO(id);
     }
-
+    @CacheEvict(value = "products", key = "#id")
     public Boolean delete(Long id) {
         ProductEntity productEntity = productRepository.findById(id).orElse(null);
         if(productEntity != null) {
@@ -90,7 +100,6 @@ public class ProductService {
         productDTO.setPrice(productEntity.getPrice());
         productDTO.setStock(productEntity.getStock());
         productDTO.setIsActive(productEntity.getIsActive());
-        productDTO.setCreatedAt(productEntity.getCreatedAt());
         return productDTO;
     }
 

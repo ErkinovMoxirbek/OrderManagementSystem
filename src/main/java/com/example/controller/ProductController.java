@@ -4,7 +4,9 @@ import com.example.dto.ProductDTO;
 import com.example.dto.create.ProductCreateDTO;
 import com.example.dto.update.ProductUpdateDTO;
 import com.example.service.ProductService;
+import com.example.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +34,10 @@ public class ProductController {
         return ResponseEntity.ok(productService.changeStatusById(id));
     }
     @GetMapping()
-    public ResponseEntity<List<ProductDTO>>  getAll() {
-        return ResponseEntity.ok(productService.getAll());
+    public ResponseEntity<PageImpl<ProductDTO>>  getAll(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return ResponseEntity.ok(productService.getAll(PageUtil.page(page),size));
     }
     //getById
     @GetMapping("/{id}")

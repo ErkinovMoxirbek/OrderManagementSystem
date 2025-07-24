@@ -1,12 +1,12 @@
-INSERT INTO products (name, price, stock, category, is_active, created_at)
-VALUES ('Piyoz', 1500.0, 20, 'sabzovot', true, CURRENT_TIMESTAMP);
-INSERT INTO products (name, price, stock, category, is_active, created_at)
-VALUES ('Kartoshka', 2500.0, 25, 'sabzovot', true, CURRENT_TIMESTAMP);
-INSERT INTO products (name, price, stock, category, is_active, created_at)
-VALUES ('Pepsi 1L', 4000.0, 25, 'suv', true, CURRENT_TIMESTAMP);
-INSERT INTO products (name, price, stock, category, is_active, created_at)
-VALUES ('Fanta 1L', 4000.0, 25, 'suv', true, CURRENT_TIMESTAMP);
-INSERT INTO profile (id, full_name, email, password, status, role, visible, created_date, verified)
+INSERT INTO products (name, price, stock, category, is_active, created_at, visible)
+VALUES ('Piyoz', 1500.0, 20, 'sabzovot', true, CURRENT_TIMESTAMP,true);
+INSERT INTO products (name, price, stock, category, is_active, created_at, visible)
+VALUES ('Kartoshka', 2500.0, 25, 'sabzovot', true, CURRENT_TIMESTAMP,true);
+INSERT INTO products (name, price, stock, category, is_active, created_at, visible)
+VALUES ('Pepsi 1L', 4000.0, 25, 'suv', true, CURRENT_TIMESTAMP,true);
+INSERT INTO products (name, price, stock, category, is_active, created_at, visible)
+VALUES ('Fanta 1L', 4000.0, 25, 'suv', true, CURRENT_TIMESTAMP,true);
+INSERT INTO profiles (id, full_name, email, password, status, role, visible, created_date, verified)
 VALUES
     ('1e9b4f30-1234-4567-890a-abcdef123456', 'John Doe', 'doe@example.com', '123456', 'ACTIVE', 'CUSTOMER', true, NOW(),true),
 

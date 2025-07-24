@@ -1,10 +1,10 @@
 package com.example.repository;
 
-import com.example.dto.OrderDTO;
 import com.example.dto.ProductDTO;
-import com.example.entity.OrderEntity;
 import com.example.entity.ProductEntity;
 import jakarta.transaction.Transactional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -23,8 +23,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.price,
             p.stock,
             p.category,
-            p.isActive,
-            p.createdAt
+            p.isActive
         )
         FROM ProductEntity p where p.visible = true
     """)
@@ -37,13 +36,14 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.price,
             p.stock,
             p.category,
-            p.isActive,
-            p.createdAt
+            p.isActive
         )
         FROM ProductEntity p
         where p.id = :id and p.visible = true
     """)
     ProductDTO findByIdDTO(@Param("id") Long id);
+
+    Page<ProductEntity> findAllByVisibleTrue(Pageable pageable);
 
     @Query("""
         SELECT new com.example.dto.ProductDTO(
@@ -52,8 +52,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.price,
             p.stock,
             p.category,
-            p.isActive,
-            p.createdAt
+            p.isActive
         )
         FROM ProductEntity p
         WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) and p.visible = true
@@ -68,8 +67,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
             p.price,
             p.stock,
             p.category,
-            p.isActive,
-            p.createdAt
+            p.isActive
         )
         FROM ProductEntity p
         where p.name = :name and p.category = :category and p.visible = true

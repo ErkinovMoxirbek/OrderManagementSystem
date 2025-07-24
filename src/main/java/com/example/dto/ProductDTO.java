@@ -18,6 +18,5 @@ public class ProductDTO {
     private Integer stock;
     private String category;
     private Boolean isActive;
-    private LocalDateTime createdAt;
 
 }

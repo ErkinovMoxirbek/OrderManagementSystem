@@ -5,7 +5,9 @@ import com.example.dto.ProfileDTO;
 import com.example.dto.update.ProfileChangePasswordDTO;
 import com.example.dto.update.ProfileUpdateDTO;
 import com.example.service.ProfileService;
+import com.example.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +16,7 @@ import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "/api/profile")
+@RequestMapping(value = "/api/profiles")
 public class ProfileController {
     @Autowired
     private ProfileService profileService;
@@ -44,6 +46,12 @@ public class ProfileController {
     @PutMapping("/change-password/{token}")
     public ResponseEntity<String> changePassword( @PathVariable String token,@Valid @RequestBody ProfileChangePasswordDTO dto) {
         return ResponseEntity.ok(profileService.changePassword(token, dto.getPassword()));
+    }
+    @GetMapping("/pagination")
+    public ResponseEntity<PageImpl<ProfileDTO>> pagination(
+            @RequestParam(value = "page", defaultValue = "1") int page,
+            @RequestParam(value = "size", defaultValue = "10") int size) {
+        return ResponseEntity.ok(profileService.pagination(PageUtil.page(page), size));
     }
 
 }

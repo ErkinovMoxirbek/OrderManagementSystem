@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS products
     255
 ),
     is_active BOOLEAN DEFAULT true,
+    visible boolean default true,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -79,7 +80,7 @@ CREATE TABLE IF NOT EXISTS order_items
   ON DELETE CASCADE
     );
 
-create table profile
+create table profiles
 (
     id           varchar(36) primary key,
     full_name    varchar(255),
@@ -96,6 +97,6 @@ CREATE TABLE email_history
     id           VARCHAR(36) PRIMARY KEY,
     to_account   VARCHAR(255),
     body         TEXT,
-    unique_info VARCHAR (255),
+    unique_info  VARCHAR(255),
     created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

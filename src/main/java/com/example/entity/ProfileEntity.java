@@ -15,7 +15,7 @@ import org.hibernate.annotations.GenericGenerator;
 @Getter
 @Setter
 @Entity
-@Table(name = "profile")
+@Table(name = "profiles")
 @ToString
 public class ProfileEntity {
     @Id
