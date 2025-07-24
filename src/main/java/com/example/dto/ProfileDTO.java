@@ -13,14 +13,8 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 public class ProfileDTO {
     private String id;
-    @NotNull
-    @NotBlank
     private String fullName;
-    @Email
-    @NotNull
-    @NotBlank
     private String email;
-    @NotNull
     private String password;
     private ProfileRole role;
 }

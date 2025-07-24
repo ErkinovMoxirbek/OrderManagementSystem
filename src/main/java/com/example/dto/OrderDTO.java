@@ -16,9 +16,7 @@ import java.time.LocalDateTime;
 @ToString
 public class OrderDTO {
     private Long id;
-    @NotBlank
     private String email;
-    @NotBlank
     private LocalDateTime orderDate;
     private OrderStatus orderStatus;
     private Double totalAmount;

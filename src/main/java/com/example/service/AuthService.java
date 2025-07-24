@@ -52,18 +52,18 @@ public class AuthService {
             logger.warn("Profile is already exists {}", dto.getEmail());
             throw new OrderAlreadyExistsException(dto.getEmail());
         }
-        if (dto.getEmail() == null || !isValidEmail(dto.getEmail())) {
-            logger.warn("Email is not valid {}", dto.getEmail());
-            throw new BadRequestException("Email format is incorrect: " + dto.getEmail());
-        }
-        if (dto.getFullName() == null || dto.getFullName().length() < 3) {
-            logger.warn("Name is too short {}", dto.getFullName());
-            throw new BadRequestException("The customer's name is not valid: " + dto.getFullName());
-        }
-        if (dto.getPassword() == null || dto.getPassword().length() < 3) {
-            logger.warn("Password is too short min len:3 -> your pass: {}", dto.getPassword());
-            throw new BadRequestException("The customer's password is not valid min len:3 -> your pass: " + dto.getPassword());
-        }
+//        if (dto.getEmail() == null || !isValidEmail(dto.getEmail())) {
+//            logger.warn("Email is not valid {}", dto.getEmail());
+//            throw new BadRequestException("Email format is incorrect: " + dto.getEmail());
+//        }
+//        if (dto.getFullName() == null || dto.getFullName().length() < 3) {
+//            logger.warn("Name is too short {}", dto.getFullName());
+//            throw new BadRequestException("The customer's name is not valid: " + dto.getFullName());
+//        }
+//        if (dto.getPassword() == null || dto.getPassword().length() < 3) {
+//            logger.warn("Password is too short min len:3 -> your pass: {}", dto.getPassword());
+//            throw new BadRequestException("The customer's password is not valid min len:3 -> your pass: " + dto.getPassword());
+//        }
 
         ProfileEntity entity = new ProfileEntity();
         entity.setFullName(dto.getFullName());
@@ -77,7 +77,6 @@ public class AuthService {
 
 
     public AuthResponseDTO authorization(AuthRequestDTO auth) {
-        isValidEmail(auth.getEmail());
         Optional<ProfileEntity> optional = profileRepository.findByEmailAndVisibleTrue(auth.getEmail());
         if (optional.isEmpty()) {
             throw new NotFoundException("Profile Not found");

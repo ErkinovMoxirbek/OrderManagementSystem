@@ -24,7 +24,6 @@ public class OrderController {
     public ResponseEntity<OrderDTO> addOrder( @RequestBody @Valid OrderCreateDTO orderCreateDTO) {
         return ResponseEntity.ok(orderService.addOrder(orderCreateDTO));
     }
-
     //List
     @GetMapping()
     public ResponseEntity<List<OrderDTO>>  getAllOrders() {

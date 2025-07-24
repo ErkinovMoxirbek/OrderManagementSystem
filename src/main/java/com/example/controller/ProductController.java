@@ -1,16 +1,12 @@
 package com.example.controller;
 
-import com.example.dto.OrderDTO;
 import com.example.dto.ProductDTO;
 import com.example.dto.create.ProductCreateDTO;
 import com.example.dto.update.ProductUpdateDTO;
-import com.example.entity.ProductEntity;
-import com.example.service.OrderService;
 import com.example.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -22,37 +18,33 @@ public class ProductController {
     @Autowired
     private ProductService productService;
 
-
-    //Add
     @PostMapping
     public ResponseEntity<ProductDTO> add( @Valid @RequestBody ProductCreateDTO productCreateDTO) {
         return ResponseEntity.ok(productService.add(productCreateDTO));
     }
-    //Update
     @PutMapping("/{id}")
-    public ResponseEntity<ProductDTO> update(@PathVariable Long id) {
-        return ResponseEntity.ok(productService.updateById(id));
+    public ResponseEntity<ProductDTO> update(@PathVariable Long id,@Valid @RequestBody ProductUpdateDTO dto) {
+        return ResponseEntity.ok(productService.updateById(id,dto));
     }
-
-    //List
+    //Product change
+    @PutMapping("/change-status/{id}")
+    public ResponseEntity<String> changeStatus(@PathVariable Long id) {
+        return ResponseEntity.ok(productService.changeStatusById(id));
+    }
     @GetMapping()
     public ResponseEntity<List<ProductDTO>>  getAll() {
         return ResponseEntity.ok(productService.getAll());
     }
-
-    //ById
+    //getById
     @GetMapping("/{id}")
     public ResponseEntity<ProductDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(productService.getById(id));
     }
-    //ByName
     @GetMapping("/search/{name}")
     public ResponseEntity< List<ProductDTO> > getByName(@PathVariable String name) {
         System.out.println(name);
         return ResponseEntity.ok(productService.getByName(name));
     }
-
-    //Delete
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
         Boolean status = productService.delete(id);
@@ -61,8 +53,6 @@ public class ProductController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-
-    //GetByNameAndCategory
     @GetMapping(value = "/customer/{name}&category={category}")
     public ResponseEntity<ProductDTO> getCustomerOrders(@PathVariable String name, @PathVariable String category) {
         return ResponseEntity.ok(productService.getByNameAndCategory(name,category));

@@ -130,4 +130,5 @@ public class EmailSenderService {
         // databasega saqlash
         emailHistoryService.create(body, null , toAccount);
     }
+
 }

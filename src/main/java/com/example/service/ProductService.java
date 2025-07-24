@@ -2,6 +2,7 @@ package com.example.service;
 
 import com.example.dto.ProductDTO;
 import com.example.dto.create.ProductCreateDTO;
+import com.example.dto.update.ProductUpdateDTO;
 import com.example.entity.ProductEntity;
 import com.example.exception.BadRequestException;
 import com.example.exception.InsufficientStockException;
@@ -30,20 +31,12 @@ public class ProductService {
             logger.warn("Stock should be greater than 0");
             throw new InsufficientStockException("Stock should be greater than 0");
         }
-        if (productCreateDTO.getName() == null || productCreateDTO.getName().trim().isEmpty()) {
-            logger.error("Product name is empty");
-            throw new BadRequestException("Product name cannot be empty");
-        }
-        if (productCreateDTO.getCategory() == null || productCreateDTO.getCategory().trim().isEmpty()) {
-            logger.error("Product category is empty");
-            throw new BadRequestException("Product category cannot be empty");
-        }
+        //agar mahsulot bor bolsa qoshmay kopaytirib qoyadi
         if (productRepository.findByName(productCreateDTO.getName()) != null) {
             ProductEntity productEntity = productRepository.findByName(productCreateDTO.getName());
             productEntity.setStock(productEntity.getStock() + productCreateDTO.getStock());
             productEntity.setCategory(productEntity.getCategory() + productCreateDTO.getCategory());
             productEntity.setIsActive(true);
-            productEntity.setCreatedAt(LocalDateTime.now());
             productEntity.setVisible(true);
             productRepository.save(productEntity);
             logger.info("Product added successfully");
@@ -54,15 +47,6 @@ public class ProductService {
         productEntity.setPrice(productCreateDTO.getPrice());
         productEntity.setStock(productCreateDTO.getStock());
         productEntity.setCategory(productCreateDTO.getCategory());
-        ProductEntity productEntity1 = productRepository.findByName(productEntity.getName());
-        //agar mahsulot bor bolsa qoshmay kopaytirib qoyadi
-         if (productEntity1 != null && productEntity1.getStock() > 0) {
-            productEntity1.setStock(productEntity.getStock() + productEntity1.getStock());
-            productEntity1.setPrice(productEntity.getPrice());
-            productEntity1.setIsActive(true);
-            logger.info("Product updated: {}",productEntity1.toString());
-            return toDTO(productRepository.save(productEntity1));
-        }
         logger.info("Product saved{}",productEntity);
         return toDTO(productRepository.save(productEntity));
     }
@@ -110,14 +94,30 @@ public class ProductService {
         return productDTO;
     }
 
-    public ProductDTO updateById(Long id) {
+    public ProductDTO updateById(Long id, ProductUpdateDTO productUpdateDTO) {
+        Optional<ProductEntity> productEntityOptional = productRepository.findById(id);
+        if (productEntityOptional.isEmpty()) {
+            logger.error("Product not found");
+            throw new NotFoundException("Product not found");
+        }
+        if (productUpdateDTO.getStock() == null || productUpdateDTO.getStock() <= 0) {
+            logger.error("Stock should be greater than 0");
+            throw new InsufficientStockException("Stock should be greater than 0");
+        }
+        ProductEntity productEntity = productEntityOptional.get();
+        productEntity.setStock(productUpdateDTO.getStock());
+        productEntity.setName(productUpdateDTO.getName());
+        productEntity.setPrice(productUpdateDTO.getPrice());
+        return toDTO(productRepository.save(productEntity));
+    }
+    public String changeStatusById(Long id) {
         Optional<ProductEntity> productEntity = productRepository.findById(id);
         if(productEntity.isEmpty()) {
             logger.error("Product not found");
             throw new NotFoundException("Product not found");
         }
         productEntity.get().setIsActive(!productEntity.get().getIsActive());
-       ;
-        return  toDTO(productEntity.get());
+        productRepository.save(productEntity.get());
+        return "Product status changed successfully";
     }
 }

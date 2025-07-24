@@ -27,6 +27,6 @@ public class OrderItemController {
         return ResponseEntity.ok(orderItemService.getAll());
     }
 
-    //Update kerakmi?
+    //Update kerakmikan deb oylanib turibman?
 
 }

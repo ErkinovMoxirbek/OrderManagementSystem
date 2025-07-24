@@ -13,14 +13,9 @@ import java.time.LocalDateTime;
 @Data
 public class ProductDTO {
     private Long id;
-    @NotNull
-    @NotBlank
     private String name;
-    @NotNull
     private Double price;
-    @NotNull
     private Integer stock;
-    @NotNull
     private String category;
     private Boolean isActive;
     private LocalDateTime createdAt;

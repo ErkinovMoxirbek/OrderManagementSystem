@@ -81,7 +81,6 @@ public class ProfileService {
 
     private ProfileUpdateDTO toDTO(ProfileEntity entity) {
         ProfileUpdateDTO dto = new ProfileUpdateDTO();
-        dto.setEmail(entity.getEmail());
         dto.setFullName(entity.getFullName());
         return dto;
     }
@@ -111,4 +110,6 @@ public class ProfileService {
         profileRepository.save(profile);
         return "Profile password changed";
     }
+
+
 }

@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -31,18 +32,17 @@ public class ProfileController {
     public ResponseEntity<Boolean> deleteProfile(@PathVariable String email) {
         return ResponseEntity.ok(profileService.deleteProfile(email));
     }
-    @PutMapping
-    public ResponseEntity<ProfileUpdateDTO> updateProfile(@RequestBody ProfileUpdateDTO profileUpdateDTO) {
-        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+    @PutMapping("/{email}")
+    public ResponseEntity<ProfileUpdateDTO> updateProfile(@PathVariable String email,@Valid @RequestBody ProfileUpdateDTO profileUpdateDTO) {
         return ResponseEntity.ok(profileService.updateProfile(email, profileUpdateDTO));
     }
     @PutMapping("/change-password")
-    public ResponseEntity<String> updatePassword(@RequestBody AuthRequestDTO dto) {
+    public ResponseEntity<String> updatePassword(@Valid @RequestBody AuthRequestDTO dto) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
         return ResponseEntity.ok(profileService.updatePassword(email,dto));
     }
     @PutMapping("/change-password/{token}")
-    public ResponseEntity<String> changePassword(@PathVariable String token, @RequestBody ProfileChangePasswordDTO dto) {
+    public ResponseEntity<String> changePassword( @PathVariable String token,@Valid @RequestBody ProfileChangePasswordDTO dto) {
         return ResponseEntity.ok(profileService.changePassword(token, dto.getPassword()));
     }
 
