@@ -71,11 +71,13 @@ public class SpringConfig {
                         // Profile
                         .requestMatchers(HttpMethod.GET, "/api/profiles/change-password/**").permitAll()
                         .requestMatchers(HttpMethod.PUT, "/api/profiles/change-password/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/profiles/me").permitAll()
 
                         .requestMatchers(HttpMethod.POST, "/api/profiles/**").authenticated()
-                        .requestMatchers(HttpMethod.GET, "/api/profiles/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/profiles/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/profiles/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/profiles/**").authenticated()
+
 
 
                         // Websocket (Chat)

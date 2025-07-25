@@ -9,6 +9,7 @@ import com.example.util.PageUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -52,6 +53,11 @@ public class ProfileController {
             @RequestParam(value = "page", defaultValue = "1") int page,
             @RequestParam(value = "size", defaultValue = "10") int size) {
         return ResponseEntity.ok(profileService.pagination(PageUtil.page(page), size));
+    }
+    @GetMapping("/me")
+    public ResponseEntity<ProfileDTO> getMe() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(profileService.getByEmail(auth.getName()));
     }
 
 }

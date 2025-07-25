@@ -1,48 +1,182 @@
+
 <!DOCTYPE html>
 <html lang="uz">
 <head>
     <meta charset="UTF-8">
-    <title>Elektron Do‘kon</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Elektron Do‘kon</title>
     <script src="https://cdn.jsdelivr.net/npm/axios@1.4.0/dist/axios.min.js"></script>
+    <style>
+        @tailwind base;
+        @tailwind components;
+        @tailwind utilities;
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+        .error-text {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+        .hamburger {
+            display: none;
+        }
+        @media (max-width: 640px) {
+            .hamburger {
+                display: block;
+            }
+            #nav-links {
+                display: none;
+            }
+            #nav-links.active {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 64px;
+                right: 0;
+                background: #2563eb;
+                width: 100%;
+                padding: 1rem;
+            }
+        }
+    </style>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans">
+<body class="bg-gray-100 min-h-screen">
+<!-- Modal -->
+<div id="modal" class="modal">
+    <div class="modal-content">
+        <p id="modal-message"></p>
+        <button onclick="closeModal()" class="mt-4 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200">Yopish</button>
+    </div>
+</div>
 
-<nav class="bg-blue-600 text-white p-4">
+<nav class="bg-gradient-to-r from-blue-600 to-blue-800 text-white p-4 shadow-lg">
     <div class="container mx-auto flex justify-between items-center">
         <h1 class="text-xl font-bold">Elektron Do‘kon</h1>
-        <div id="nav-links" class="hidden space-x-4">
-            <button onclick="showProducts()" class="hover:underline">Mahsulotlar</button>
-            <button onclick="logout()" class="hover:underline">Chiqish</button>
+        <button class="hamburger md:hidden text-2xl" onclick="toggleMenu()">☰</button>
+        <div id="nav-links" class="hidden md:flex space-x-4">
+            <button onclick="showProducts()" class="hover:underline transition duration-200">Mahsulotlar</button>
+            <button onclick="showCart()" class="hover:underline transition duration-200">Savat</button>
+            <button onclick="showProfile()" class="hover:underline transition duration-200">Mening ma’lumotlarim</button>
+            <button onclick="logout()" class="hover:underline transition duration-200">Chiqish</button>
         </div>
     </div>
 </nav>
 
 <div class="container mx-auto p-4">
     <!-- Login -->
-    <div id="login-section" class="max-w-sm mx-auto bg-white p-6 rounded shadow">
-        <h2 class="text-xl font-bold mb-4 text-center">Kirish</h2>
+    <div id="login-section" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-2xl font-bold mb-4 text-center">Kirish</h2>
         <form id="login-form">
-            <input type="email" id="login-email" placeholder="Email" class="w-full p-2 mb-4 border rounded" required>
-            <input type="password" id="login-password" placeholder="Parol" class="w-full p-2 mb-4 border rounded" required>
-            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Kirish</button>
+            <div class="mb-4">
+                <input
+                        type="email"
+                        id="login-email"
+                        placeholder="Email"
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        required
+                />
+                <p id="login-email-error" class="error-text hidden"></p>
+            </div>
+            <div class="mb-4">
+                <input
+                        type="password"
+                        id="login-password"
+                        placeholder="Parol"
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        required
+                />
+                <p id="login-password-error" class="error-text hidden"></p>
+            </div>
+            <button
+                    type="submit"
+                    class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition duration-200"
+            >
+                Kirish
+            </button>
             <p class="mt-4 text-center">
-                Hisobingiz yo‘qmi?
+                Hisobingiz yo‘qmi?{' '}
                 <button type="button" onclick="showRegister()" class="text-blue-600 hover:underline">Ro‘yxatdan o‘tish</button>
             </p>
         </form>
     </div>
 
     <!-- Register -->
-    <div id="register-section" class="max-w-sm mx-auto bg-white p-6 rounded shadow hidden">
-        <h2 class="text-xl font-bold mb-4 text-center">Ro‘yxatdan o‘tish</h2>
+    <div id="register-section" class="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md hidden">
+        <h2 class="text-2xl font-bold mb-4 text-center">Ro‘yxatdan o‘tish</h2>
         <form id="register-form">
-            <input type="email" id="register-email" placeholder="Email" class="w-full p-2 mb-4 border rounded" required>
-            <input type="password" id="register-password" placeholder="Parol" class="w-full p-2 mb-4 border rounded" required>
-            <button type="submit" class="w-full bg-blue-600 text-white p-2 rounded hover:bg-blue-700">Ro‘yxatdan o‘tish</button>
+            <div class="mb-4">
+                <input
+                        type="text"
+                        id="register-fullname"
+                        placeholder="To‘liq ism"
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        required
+                />
+                <p id="register-fullname-error" class="error-text hidden"></p>
+            </div>
+            <div class="mb-4">
+                <input
+                        type="email"
+                        id="register-email"
+                        placeholder="Email"
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        required
+                />
+                <p id="register-email-error" class="error-text hidden"></p>
+            </div>
+            <div class="mb-4">
+                <input
+                        type="password"
+                        id="register-password"
+                        placeholder="Parol"
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        required
+                />
+                <p id="register-password-error" class="error-text hidden"></p>
+            </div>
+            <div class="mb-4">
+                <input
+                        type="password"
+                        id="register-confirm-password"
+                        placeholder="Parolni tasdiqlang"
+                        class="w-full p-3 border rounded focus:outline-none focus:ring-2 focus:ring-blue-600"
+                        required
+                />
+                <p id="register-confirm-password-error" class="error-text hidden"></p>
+            </div>
+            <button
+                    type="submit"
+                    class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition duration-200"
+            >
+                Ro‘yxatdan o‘tish
+            </button>
             <p class="mt-4 text-center">
-                Hisobingiz bormi?
+                Hisobingiz bormi?{' '}
                 <button type="button" onclick="showLogin()" class="text-blue-600 hover:underline">Kirish</button>
             </p>
         </form>
@@ -50,17 +184,39 @@
 
     <!-- Products -->
     <div id="products-section" class="hidden">
-        <h2 class="text-xl font-bold mb-4 text-center">Mahsulotlar</h2>
-        <div id="products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        <h2 class="text-2xl font-bold mb-4 text-center">Mahsulotlar</h2>
+        <div id="products-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Cart -->
+    <div id="cart-section" class="hidden">
+        <h2 class="text-2xl font-bold mb-4 text-center">Savat</h2>
+        <div class="flex justify-end mb-4">
+            <button onclick="clearCart()" class="bg-red-600 text-white p-2 rounded hover:bg-red-700 transition duration-200">Savatni bo‘shatish</button>
+        </div>
+        <div id="cart-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- Profile -->
+    <div id="profile-section" class="hidden">
+        <h2 class="text-2xl font-bold mb-4 text-center">Mening ma’lumotlarim</h2>
+        <div id="profile-details" class="bg-white p-6 rounded-lg shadow-md max-w-md mx-auto"></div>
     </div>
 </div>
 
 <script>
     const API_BASE_URL = 'http://localhost:8080/api';
+    // Statik placeholder rasmlar
+    const PLACEHOLDER_IMAGES = {
+        'elektronika': 'https://images.unsplash.com/photo-1516321310766-47f9e40f6493',
+        'kiyim': 'https://images.unsplash.com/photo-1521335625578-1a8e84ebdd70',
+        'uy-ro‘zg‘or': 'https://images.unsplash.com/photo-1556911220-bff31c812dba',
+        'default': 'https://via.placeholder.com/150'
+    };
 
-    // token helper
+    // Token helper
     function getToken() {
-        return localStorage.getItem('jwtToken') || '';
+        return localStorage.getItem('jwtToken') || null;
     }
 
     function setToken(token) {
@@ -69,66 +225,193 @@
 
     function removeToken() {
         localStorage.removeItem('jwtToken');
+        localStorage.removeItem('cart');
     }
 
-    // show sections
+    // Modal functions
+    function showModal(message) {
+        document.getElementById('modal-message').textContent = message;
+        document.getElementById('modal').style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('modal').style.display = 'none';
+    }
+
+    // Toggle menu for mobile
+    function toggleMenu() {
+        const navLinks = document.getElementById('nav-links');
+        navLinks.classList.toggle('active');
+    }
+
+    // Show sections
     function showLogin() {
         document.getElementById('login-section').classList.remove('hidden');
         document.getElementById('register-section').classList.add('hidden');
         document.getElementById('products-section').classList.add('hidden');
+        document.getElementById('cart-section').classList.add('hidden');
+        document.getElementById('profile-section').classList.add('hidden');
         document.getElementById('nav-links').classList.add('hidden');
+        document.getElementById('login-form').reset();
+        clearErrors();
     }
 
     function showRegister() {
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('register-section').classList.remove('hidden');
         document.getElementById('products-section').classList.add('hidden');
+        document.getElementById('cart-section').classList.add('hidden');
+        document.getElementById('profile-section').classList.add('hidden');
         document.getElementById('nav-links').classList.add('hidden');
+        document.getElementById('register-form').reset();
+        clearErrors();
     }
 
     function showProducts() {
+        const token = getToken();
+        if (!token) {
+            showModal('Avval tizimga kiring.');
+            showLogin();
+            return;
+        }
         document.getElementById('login-section').classList.add('hidden');
         document.getElementById('register-section').classList.add('hidden');
         document.getElementById('products-section').classList.remove('hidden');
+        document.getElementById('cart-section').classList.add('hidden');
+        document.getElementById('profile-section').classList.add('hidden');
         document.getElementById('nav-links').classList.remove('hidden');
         fetchProducts();
     }
 
-    // login
+    function showCart() {
+        const token = getToken();
+        if (!token) {
+            showModal('Avval tizimga kiring.');
+            showLogin();
+            return;
+        }
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('register-section').classList.add('hidden');
+        document.getElementById('products-section').classList.add('hidden');
+        document.getElementById('cart-section').classList.remove('hidden');
+        document.getElementById('profile-section').classList.add('hidden');
+        document.getElementById('nav-links').classList.remove('hidden');
+        renderCart();
+    }
+
+    function showProfile() {
+        const token = getToken();
+        if (!token) {
+            showModal('Avval tizimga kiring.');
+            showLogin();
+            return;
+        }
+        document.getElementById('login-section').classList.add('hidden');
+        document.getElementById('register-section').classList.add('hidden');
+        document.getElementById('products-section').classList.add('hidden');
+        document.getElementById('cart-section').classList.add('hidden');
+        document.getElementById('profile-section').classList.remove('hidden');
+        document.getElementById('nav-links').classList.remove('hidden');
+        fetchProfile();
+    }
+
+    // Clear error messages
+    function clearErrors() {
+        document.getElementById('register-fullname-error').classList.add('hidden');
+        document.getElementById('register-email-error').classList.add('hidden');
+        document.getElementById('register-password-error').classList.add('hidden');
+        document.getElementById('register-confirm-password-error').classList.add('hidden');
+        document.getElementById('login-email-error').classList.add('hidden');
+        document.getElementById('login-password-error').classList.add('hidden');
+    }
+
+    // Login
     document.getElementById('login-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        clearErrors();
         const email = document.getElementById('login-email').value;
         const password = document.getElementById('login-password').value;
+
+        if (!email.includes('@')) {
+            document.getElementById('login-email-error').textContent = 'To‘g‘ri email kiriting.';
+            document.getElementById('login-email-error').classList.remove('hidden');
+            return;
+        }
+        if (password.length < 6) {
+            document.getElementById('login-password-error').textContent = 'Parol kamida 6 belgidan iborat bo‘lishi kerak.';
+            document.getElementById('login-password-error').classList.remove('hidden');
+            return;
+        }
 
         try {
             const res = await axios.post(`${API_BASE_URL}/auth/login`, { email, password });
             setToken(res.data.token);
+            document.getElementById('login-form').reset();
             showProducts();
         } catch (err) {
-            alert("Kirishda xatolik: " + (err.response?.data?.message || "Email yoki parol noto‘g‘ri"));
+            showModal('Kirish xatosi: ' + (err.response?.data?.message || 'Email yoki parolni tekshiring.'));
         }
     });
 
-    // register
+    // Register
     document.getElementById('register-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        clearErrors();
+        const fullName = document.getElementById('register-fullname').value;
         const email = document.getElementById('register-email').value;
         const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+
+        if (fullName.length < 3) {
+            document.getElementById('register-fullname-error').textContent = 'To‘liq ism kamida 3 harfdan iborat bo‘lishi kerak.';
+            document.getElementById('register-fullname-error').classList.remove('hidden');
+            return;
+        }
+        if (!email.includes('@')) {
+            document.getElementById('register-email-error').textContent = 'To‘g‘ri email kiriting.';
+            document.getElementById('register-email-error').classList.remove('hidden');
+            return;
+        }
+        if (password.length < 6) {
+            document.getElementById('register-password-error').textContent = 'Parol kamida 6 belgidan iborat bo‘lishi kerak.';
+            document.getElementById('register-password-error').classList.remove('hidden');
+            return;
+        }
+        if (password !== confirmPassword) {
+            document.getElementById('register-confirm-password-error').textContent = 'Parollar mos kelmaydi.';
+            document.getElementById('register-confirm-password-error').classList.remove('hidden');
+            return;
+        }
 
         try {
-            await axios.post(`${API_BASE_URL}/auth/registration`, { email, password });
-            alert("Ro‘yxatdan o‘tish muvaffaqiyatli! Endi login qiling.");
+            await axios.post(`${API_BASE_URL}/auth/registration`, { fullName, email, password });
+            showModal('Ro‘yxatdan o‘tish muvaffaqiyatli! Emailingizga tasdiqlash xati yuborildi.');
+            document.getElementById('register-form').reset();
             showLogin();
         } catch (err) {
-            alert("Ro‘yxatdan o‘tishda xatolik: " + (err.response?.data?.message || "Qayta urinib ko‘ring"));
+            showModal('Ro‘yxatdan o‘tish xatosi: ' + (err.response?.data?.message || 'Ma’lumotlarni tekshiring.'));
         }
     });
 
-    // fetch products
+    // Get product image based on category or name
+    function getProductImage(category, name) {
+        const lowerCategory = (category || '').toLowerCase();
+        const lowerName = (name || '').toLowerCase();
+        if (lowerCategory.includes('elektronika') || lowerName.includes('telefon') || lowerName.includes('kompyuter')) {
+            return PLACEHOLDER_IMAGES['elektronika'];
+        } else if (lowerCategory.includes('kiyim') || lowerName.includes('ko‘ylak') || lowerName.includes('shim')) {
+            return PLACEHOLDER_IMAGES['kiyim'];
+        } else if (lowerCategory.includes('uy') || lowerName.includes('mebel') || lowerName.includes('ro‘zg‘or')) {
+            return PLACEHOLDER_IMAGES['uy-ro‘zg‘or'];
+        }
+        return PLACEHOLDER_IMAGES['default'];
+    }
+
+    // Fetch products
     async function fetchProducts() {
         const token = getToken();
         if (!token) {
-            alert("Avval login qiling.");
+            showModal('Avval tizimga kiring.');
             showLogin();
             return;
         }
@@ -136,49 +419,147 @@
         try {
             const page = 1;
             const size = 10;
-
             const res = await axios.get(`${API_BASE_URL}/products?page=${page}&size=${size}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
-
-            const products = res.data.content; // ✅ faqat content kerak
+            const products = res.data.content || [];
             const list = document.getElementById('products-list');
             list.innerHTML = '';
 
-            if (!products || products.length === 0) {
+            if (products.length === 0) {
                 list.innerHTML = '<p class="text-center text-gray-600">Mahsulotlar yo‘q.</p>';
                 return;
             }
 
-            products.forEach(p => {
+            for (const p of products) {
+                const imageUrl = p.imageUrl || getProductImage(p.category, p.name);
                 const div = document.createElement('div');
-                div.className = 'bg-white p-4 rounded shadow';
+                div.className = 'bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200';
                 div.innerHTML = `
-                <h3 class="text-lg font-bold">${p.name || 'Nomsiz'}</h3>
-                <p class="text-gray-600">${p.price ? '$' + p.price : 'Narx yo‘q'}</p>
-                <p class="text-gray-600">${p.category || 'Kategoriya yo‘q'}</p>
-            `;
+                        <img src="${imageUrl}" alt="${p.name || 'Mahsulot'}" class="w-full h-48 object-cover rounded mb-3">
+                        <h3 class="text-lg font-bold">${p.name || 'Nomsiz'}</h3>
+                        <p class="text-gray-600">${p.price ? '$' + p.price : 'Narx yo‘q'}</p>
+                        <p class="text-gray-600">${p.category || 'Kategoriya yo‘q'}</p>
+                        <button onclick="addToCart(${p.id}, '${p.name}', ${p.price || 0}, '${imageUrl}')" class="mt-3 bg-green-600 text-white p-2 rounded hover:bg-green-700 transition duration-200 w-full">Savatga qo‘shish</button>
+                    `;
                 list.appendChild(div);
-            });
-
+            }
         } catch (err) {
-            alert("Mahsulotlarni olishda xatolik: " + (err.response?.data?.message || "Qayta urinib ko‘ring"));
+            showModal('Mahsulotlarni yuklashda xato: ' + (err.response?.data?.message || 'Tizimga qayta kiring.'));
+            showLogin();
         }
     }
 
-    // logout
+    // Cart management
+    function addToCart(id, name, price, imageUrl) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const existingItem = cart.find(item => item.id === id);
+        if (existingItem) {
+            existingItem.quantity += 1;
+        } else {
+            cart.push({ id, name, price, imageUrl, quantity: 1 });
+        }
+        localStorage.setItem('cart', JSON.stringify(cart));
+        showModal(`${name} savatga qo‘shildi!`);
+    }
+
+    function updateCartItem(id, delta) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const item = cart.find(item => item.id === id);
+        if (item) {
+            item.quantity += delta;
+            if (item.quantity <= 0) {
+                cart = cart.filter(item => item.id !== id);
+            }
+            localStorage.setItem('cart', JSON.stringify(cart));
+            renderCart();
+        }
+    }
+
+    function removeCartItem(id) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart = cart.filter(item => item.id !== id);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCart();
+        showModal('Mahsulot savatdan o‘chirildi.');
+    }
+
+    function clearCart() {
+        localStorage.removeItem('cart');
+        renderCart();
+        showModal('Savat bo‘shatildi.');
+    }
+
+    function renderCart() {
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        const list = document.getElementById('cart-list');
+        list.innerHTML = '';
+
+        if (cart.length === 0) {
+            list.innerHTML = '<p class="text-center text-gray-600">Savat bo‘sh.</p>';
+            return;
+        }
+
+        cart.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'bg-white p-4 rounded-lg shadow-md hover:shadow-lg transition duration-200';
+            div.innerHTML = `
+                    <img src="${item.imageUrl || 'https://via.placeholder.com/150'}" alt="${item.name}" class="w-full h-48 object-cover rounded mb-3">
+                    <h3 class="text-lg font-bold">${item.name}</h3>
+                    <p class="text-gray-600">Narx: $${item.price}</p>
+                    <p class="text-gray-600">Soni: ${item.quantity}</p>
+                    <p class="text-gray-600">Jami: $${(item.price * item.quantity).toFixed(2)}</p>
+                    <div class="flex space-x-2 mt-3">
+                        <button onclick="updateCartItem(${item.id}, 1)" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200">+</button>
+                        <button onclick="updateCartItem(${item.id}, -1)" class="bg-blue-600 text-white p-2 rounded hover:bg-blue-700 transition duration-200">-</button>
+                        <button onclick="removeCartItem(${item.id})" class="bg-red-600 text-white p-2 rounded hover:bg-red-700 transition duration-200">O‘chirish</button>
+                    </div>
+                `;
+            list.appendChild(div);
+        });
+    }
+
+    // Fetch profile
+    async function fetchProfile() {
+        const token = getToken();
+        if (!token) {
+            showModal('Avval tizimga kiring.' + token);
+            showLogin();
+            return;
+        }
+
+        try {
+            const res = await axios.get(`${API_BASE_URL}/profiles/me`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            const profile = res.data;
+            const details = document.getElementById('profile-details');
+            details.innerHTML = `
+                    <p class="text-gray-600 text-lg"><strong>Ism:</strong> ${profile.fullName || 'Noma’lum'}</p>
+                    <p class="text-gray-600 text-lg"><strong>Email:</strong> ${profile.email || 'Noma’lum'}</p>
+                `;
+        } catch (err) {
+            const errorMessage = err.response?.status === 401
+                ? 'Sessiya tugagan. Iltimos, qayta kiring.'
+                : (err.response?.data?.message || 'Ma’lumotlarni yuklashda xato yuz berdi.');
+            showModal('Profil xatosi: ' + errorMessage + token);
+            removeToken();
+            showLogin();
+        }
+    }
+
+    // Logout
     function logout() {
         removeToken();
         showLogin();
     }
 
-    // check login
+    // Check login
     if (getToken()) {
         showProducts();
     } else {
         showLogin();
     }
-
 </script>
 </body>
 </html>

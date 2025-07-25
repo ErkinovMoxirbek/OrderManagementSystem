@@ -25,6 +25,7 @@ public class CustomUserDetails implements UserDetails {
 
     public CustomUserDetails(ProfileEntity profile) {
         this.fullName = profile.getFullName();
+        this.email = profile.getEmail();
         this.password = profile.getPassword();
         this.role = profile.getRole();
         this.status = profile.getStatus();

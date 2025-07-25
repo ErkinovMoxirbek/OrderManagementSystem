@@ -57,7 +57,7 @@ public interface ProductRepository extends JpaRepository<ProductEntity, Long> {
         FROM ProductEntity p
         WHERE LOWER(p.name) LIKE LOWER(CONCAT('%', :name, '%')) and p.visible = true
     """)
-    List<ProductDTO> findByNameDTO(@Param("name") String name);
+    List<ProductDTO> findAllByNameDTO(@Param("name") String name);
 
 
     @Query("""

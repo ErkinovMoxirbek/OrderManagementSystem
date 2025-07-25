@@ -20,6 +20,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
+import static com.example.mapper.ProductMapper.toDTO;
+import static com.example.mapper.ProductMapper.toEntity;
+
 @Slf4j
 @Service
 public class ProductService {
@@ -44,11 +47,7 @@ public class ProductService {
             logger.info("Product added successfully");
             return toDTO(productEntity);
         }
-        ProductEntity productEntity = new ProductEntity();
-        productEntity.setName(productCreateDTO.getName());
-        productEntity.setPrice(productCreateDTO.getPrice());
-        productEntity.setStock(productCreateDTO.getStock());
-        productEntity.setCategory(productCreateDTO.getCategory());
+        ProductEntity productEntity = toEntity(productCreateDTO);
         logger.info("Product saved{}",productEntity);
         return toDTO(productRepository.save(productEntity));
     }
@@ -59,16 +58,18 @@ public class ProductService {
 
             List<ProductDTO> dtoList = new LinkedList<>();
             for (ProductEntity product: result.getContent()) {
-                ProductDTO dto = new ProductDTO(product.getId(),product.getName(),product.getPrice(),product.getStock(),product.getCategory(),product.getIsActive());
-                dtoList.add(dto);
+                dtoList.add(toDTO(product));
             }
             logger.info("Get all products");
             return new PageImpl<>(dtoList, pageable, result.getTotalElements());
     }
     @Cacheable(value = "products", key = "#id")
     public ProductDTO getById(Long id) {
+        if (id == null) {
+            throw new NullPointerException("Product id is null");
+        }
         logger.info("Get product by id: {}", id);
-        return productRepository.findByIdDTO(id);
+        return toDTO(productRepository.findById(id).get());
     }
     @CacheEvict(value = "products", key = "#id")
     public Boolean delete(Long id) {
@@ -88,19 +89,13 @@ public class ProductService {
         return productRepository.searchByNameAndCategoryDTO(name,category);
     }
 
-    public List<ProductDTO> getByName(String name) {
+    public List<ProductDTO> getAllByName(String name) {
+        if (name == null) {
+            logger.error("Name is null");
+            throw new NullPointerException("Product name is null");
+        }
         logger.info("Get product by name: {}", name);
-        return productRepository.findByNameDTO(name);
-    }
-    public ProductDTO toDTO(ProductEntity productEntity) {
-        ProductDTO productDTO = new ProductDTO();
-        productDTO.setId(productEntity.getId());
-        productDTO.setName(productEntity.getName());
-        productDTO.setCategory(productEntity.getCategory());
-        productDTO.setPrice(productEntity.getPrice());
-        productDTO.setStock(productEntity.getStock());
-        productDTO.setIsActive(productEntity.getIsActive());
-        return productDTO;
+        return productRepository.findAllByNameDTO(name);
     }
 
     public ProductDTO updateById(Long id, ProductUpdateDTO productUpdateDTO) {

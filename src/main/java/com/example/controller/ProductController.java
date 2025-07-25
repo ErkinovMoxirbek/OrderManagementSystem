@@ -45,9 +45,9 @@ public class ProductController {
         return ResponseEntity.ok(productService.getById(id));
     }
     @GetMapping("/search/{name}")
-    public ResponseEntity< List<ProductDTO> > getByName(@PathVariable String name) {
+    public ResponseEntity< List<ProductDTO> > getAllByName(@PathVariable String name) {
         System.out.println(name);
-        return ResponseEntity.ok(productService.getByName(name));
+        return ResponseEntity.ok(productService.getAllByName(name));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Long id) {
